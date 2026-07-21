@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Incident Copilot -- agentic memory on CockroachDB + Amazon Bedrock
+
+Parameters:
+  DatabaseUrl:
+    Type: String
+    NoEcho: true
+    Description: CockroachDB Cloud connection string (postgresql://...)
+  ChatModelId:
+    Type: String
+    Default: us.anthropic.claude-sonnet-5-20250929-v1:0
+  EmbedModelId:
+    Type: String
+    Default: amazon.titan-embed-text-v2:0
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 120
+    MemorySize: 1024
+
+Resources:
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  AgentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../
+      Handler: src.lambda_handler.handler
+      Environment:
+        Variables:
+          DATABASE_URL: !Ref DatabaseUrl
+          CHAT_MODEL_ID: !Ref ChatModelId
+          EMBED_MODEL_ID: !Ref EmbedModelId
+          S3_BUCKET: !Ref ArtifactBucket
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins: ["*"]
+          AllowMethods: ["GET", "POST"]
+          AllowHeaders: ["content-type"]
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
+        - S3CrudPolicy:
+            BucketName: !Ref ArtifactBucket
+
+Outputs:
+  FunctionUrl:
+    Description: Public endpoint -- POST /alert, GET /session?id=, GET /stats
+    Value: !GetAtt AgentFunctionUrl.FunctionUrl
+  ArtifactBucketName:
+    Value: !Ref ArtifactBucket
