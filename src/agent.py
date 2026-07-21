@@ -1,19 +1,35 @@
 """The agent loop: recall -> reason -> act -> write back.
 
-Claude runs on Amazon Bedrock and is given tools that read and write
-CockroachDB memory. The important property is the last step: every run
-*deposits* something durable, so the next run starts smarter than this one.
+Runs on Amazon Bedrock through the **Converse API**, which is deliberately
+model-agnostic: the same tool definitions and the same loop drive Claude, Nova,
+or anything else Bedrock exposes, selected by CHAT_MODEL_ID alone. That matters
+operationally -- Anthropic models on Bedrock require an AWS Marketplace
+subscription while Amazon's first-party models do not, so an account issue on
+one family should never be a code change.
+
+The important property of the loop is its last step: every run *deposits*
+something durable, so the next run starts smarter than this one.
 """
 
 from __future__ import annotations
 
-import json
+import re
 from functools import lru_cache
 from typing import Any
 
 import boto3
 
 from . import config, memory
+
+# Some Bedrock models (Nova especially) narrate their planning inside
+# <thinking> tags in the visible text. Useful to log, noise to an on-call
+# engineer, so it is stripped from the answer but kept in the session trace.
+_THINKING = re.compile(r"<thinking>.*?</thinking>", re.DOTALL | re.IGNORECASE)
+
+
+def strip_thinking(text: str) -> str:
+    return _THINKING.sub("", text).strip()
+
 
 SYSTEM_PROMPT = """You are Incident Copilot, an on-call engineering agent.
 
@@ -34,6 +50,7 @@ Process:
 
 Be concise. On-call engineers are reading you at 3am."""
 
+# Converse-API tool specs. One definition, every model family.
 TOOLS = [
     {
         "name": "recall_similar_incidents",
@@ -101,23 +118,34 @@ TOOLS = [
 ]
 
 
+def _tool_config() -> dict[str, Any]:
+    return {
+        "tools": [
+            {
+                "toolSpec": {
+                    "name": t["name"],
+                    "description": t["description"],
+                    "inputSchema": {"json": t["input_schema"]},
+                }
+            }
+            for t in TOOLS
+        ]
+    }
+
+
 @lru_cache(maxsize=1)
 def _client():
     return boto3.client("bedrock-runtime", region_name=config.AWS_REGION)
 
 
-def _invoke(messages: list[dict[str, Any]]) -> dict[str, Any]:
-    body = json.dumps(
-        {
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 2048,
-            "system": SYSTEM_PROMPT,
-            "tools": TOOLS,
-            "messages": messages,
-        }
+def _converse(messages: list[dict[str, Any]]) -> dict[str, Any]:
+    return _client().converse(
+        modelId=config.CHAT_MODEL_ID,
+        system=[{"text": SYSTEM_PROMPT}],
+        messages=messages,
+        toolConfig=_tool_config(),
+        inferenceConfig={"maxTokens": 2048, "temperature": 0.2},
     )
-    resp = _client().invoke_model(modelId=config.CHAT_MODEL_ID, body=body)
-    return json.loads(resp["body"].read())
 
 
 def _run_tool(name: str, args: dict[str, Any], session_id: str) -> str:
@@ -169,44 +197,53 @@ def handle_alert(
     session_id = memory.open_session(alert_text, service)
     memory.append_step(session_id, "user", alert_text)
 
-    messages: list[dict[str, Any]] = [{"role": "user", "content": alert_text}]
+    messages: list[dict[str, Any]] = [
+        {"role": "user", "content": [{"text": alert_text}]}
+    ]
     tools_used: list[str] = []
     said: list[str] = []
     finished = False
 
     for _ in range(max_turns):
-        reply = _invoke(messages)
-        messages.append({"role": "assistant", "content": reply["content"]})
+        reply = _converse(messages)
+        content = reply["output"]["message"]["content"]
+        messages.append({"role": "assistant", "content": content})
 
-        for block in reply["content"]:
-            if block["type"] == "text" and block["text"].strip():
+        for block in content:
+            if "text" in block and block["text"].strip():
+                # Full text (planning included) goes to the durable trace;
+                # only the cleaned version is surfaced as the answer.
                 memory.append_step(session_id, "assistant", block["text"])
-                said.append(block["text"])
+                visible = strip_thinking(block["text"])
+                if visible:
+                    said.append(visible)
 
-        if reply.get("stop_reason") != "tool_use":
+        if reply.get("stopReason") != "tool_use":
             finished = True
             break
 
         results = []
-        for block in reply["content"]:
-            if block["type"] != "tool_use":
+        for block in content:
+            if "toolUse" not in block:
                 continue
-            tools_used.append(block["name"])
-            output = _run_tool(block["name"], block["input"], session_id)
+            use = block["toolUse"]
+            tools_used.append(use["name"])
+            output = _run_tool(use["name"], use["input"], session_id)
             memory.append_step(
-                session_id, "memory", f"{block['name']} -> {output[:2000]}"
+                session_id, "memory", f"{use['name']} -> {output[:2000]}"
             )
             results.append(
                 {
-                    "type": "tool_result",
-                    "tool_use_id": block["id"],
-                    "content": output,
+                    "toolResult": {
+                        "toolUseId": use["toolUseId"],
+                        "content": [{"text": output}],
+                    }
                 }
             )
         messages.append({"role": "user", "content": results})
 
     # Accumulate text as it arrives rather than reading it off the last
-    # message: when max_turns runs out, the last message is a tool_result,
+    # message: when max_turns runs out, the last message is a toolResult,
     # and reading that back would silently return an empty answer.
     memory.close_session(session_id, "resolved" if finished else "truncated")
 
@@ -215,4 +252,5 @@ def handle_alert(
         "answer": "\n\n".join(said),
         "tools_used": tools_used,
         "truncated": not finished,
+        "model": config.CHAT_MODEL_ID,
     }

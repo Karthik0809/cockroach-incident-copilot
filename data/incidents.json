@@ -7,7 +7,8 @@
     "symptoms": "p99 latency climbed from 180ms to 30s over 20 minutes. Gateway returned 504s on ~40% of POST /checkout. CPU flat, memory flat. Database CPU normal.",
     "root_cause": "Connection pool exhaustion. A retry added two weeks earlier did not release its connection on the timeout path, so every timed-out request permanently leaked one pooled connection.",
     "resolution": "Rolled back the retry change, then reissued it with the connection acquired inside a context manager. Raised pool max from 20 to 50 as a buffer and added a pool-utilization alert at 80%.",
-    "lesson": "Flat CPU with climbing latency almost always means the service is waiting on a finite resource, not computing. Check pool utilization before you check code hot paths."
+    "lesson": "Flat CPU with climbing latency almost always means the service is waiting on a finite resource, not computing. Check pool utilization before you check code hot paths.",
+    "occurred_at": "2024-11-08T14:30:00Z"
   },
   {
     "external_id": "INC-1077",
@@ -17,7 +18,8 @@
     "symptoms": "Users reported newly created listings missing from search. Indexer showed no errors and its dashboard was green. Kafka consumer lag was near zero.",
     "root_cause": "The indexer was silently dropping messages whose payload exceeded a 1MB limit. The drop path logged at DEBUG, which was filtered out in production, so the dashboard stayed green.",
     "resolution": "Raised the payload limit, moved the drop path to ERROR level, and added a dropped-message counter to the dashboard.",
-    "lesson": "A green dashboard only proves the metrics you chose are healthy. When behavior and metrics disagree, suspect the metrics."
+    "lesson": "A green dashboard only proves the metrics you chose are healthy. When behavior and metrics disagree, suspect the metrics.",
+    "occurred_at": "2025-01-22T14:30:00Z"
   },
   {
     "external_id": "INC-1103",
@@ -27,7 +29,8 @@
     "symptoms": "Small number of customers double-charged. Webhook handler logs showed the same event id processed by two workers within 200ms of each other.",
     "root_cause": "Idempotency check used a read-then-write against a cache with no locking. Two workers both read 'not seen' before either wrote.",
     "resolution": "Replaced the cache check with a unique constraint on event_id in the primary database, letting the write itself enforce idempotency.",
-    "lesson": "Idempotency belongs in a uniqueness constraint at the storage layer, never in an application-level read-then-write."
+    "lesson": "Idempotency belongs in a uniqueness constraint at the storage layer, never in an application-level read-then-write.",
+    "occurred_at": "2025-03-14T14:30:00Z"
   },
   {
     "external_id": "INC-1150",
@@ -37,7 +40,8 @@
     "symptoms": "Weekly revenue report came in 12% low. ETL job reported success every night. Row counts in the destination were consistently lower than source.",
     "root_cause": "A batch insert used ON CONFLICT DO NOTHING against a table whose unique key had been narrowed in a migration, so legitimately distinct rows collided and were discarded.",
     "resolution": "Restored the composite unique key and backfilled 9 days of data. Added a source-vs-destination row count assertion to the job.",
-    "lesson": "ON CONFLICT DO NOTHING converts data loss into a successful exit code. Any job that uses it needs an independent row count check."
+    "lesson": "ON CONFLICT DO NOTHING converts data loss into a successful exit code. Any job that uses it needs an independent row count check.",
+    "occurred_at": "2025-05-30T14:30:00Z"
   },
   {
     "external_id": "INC-1188",
@@ -47,7 +51,8 @@
     "symptoms": "After a planned us-east-1 failover, login latency in eu-west-1 went from 90ms to 1.4s. Error rate stayed at zero. Traffic volume unchanged.",
     "root_cause": "Session lookups were still being routed to the primary region because the read replica config was pinned to a hardcoded endpoint from an old deploy.",
     "resolution": "Moved endpoint resolution to service discovery and added a cross-region latency SLO alert.",
-    "lesson": "Zero errors plus multiplied latency after a failover means traffic is crossing a region boundary it shouldn't. Look at endpoint config before database performance."
+    "lesson": "Zero errors plus multiplied latency after a failover means traffic is crossing a region boundary it shouldn't. Look at endpoint config before database performance.",
+    "occurred_at": "2025-08-19T14:30:00Z"
   },
   {
     "external_id": "INC-1204",
@@ -57,7 +62,8 @@
     "symptoms": "Uploads over roughly 8MB returned 502. Smaller uploads fine. No entries in the application log at all for failed requests.",
     "root_cause": "Load balancer request body limit was lower than the application's configured limit, so the LB rejected the request before it ever reached the app.",
     "resolution": "Aligned the LB body limit with the application limit and added a synthetic large-file upload check.",
-    "lesson": "If a failing request produces no application log line, the failure happened upstream of the application. Work outward from the app, not inward."
+    "lesson": "If a failing request produces no application log line, the failure happened upstream of the application. Work outward from the app, not inward.",
+    "occurred_at": "2025-11-05T14:30:00Z"
   },
   {
     "external_id": "INC-1231",
@@ -67,7 +73,8 @@
     "symptoms": "Homepage TTFB doubled after a release. CPU flat. The flag provider's status page reported degraded performance in one region.",
     "root_cause": "The SDK was initialized in blocking mode with no timeout, so every page render waited on a remote flag fetch.",
     "resolution": "Switched to the SDK's local cache mode with a background refresh and a 50ms hard timeout defaulting to the last known value.",
-    "lesson": "Any third-party call in a request path needs a timeout and a fallback value, and flag SDKs are the ones people forget."
+    "lesson": "Any third-party call in a request path needs a timeout and a fallback value, and flag SDKs are the ones people forget.",
+    "occurred_at": "2026-02-11T14:30:00Z"
   },
   {
     "external_id": "INC-1276",
@@ -77,6 +84,7 @@
     "symptoms": "Monthly invoices generated twice for a subset of accounts. Job history showed two runs 4 minutes apart on the same schedule.",
     "root_cause": "A node drain caused the CronJob controller to reschedule a job it could not confirm had completed, and the job had no run-level locking.",
     "resolution": "Added a database-backed advisory lock keyed on the billing period, so a second run exits immediately.",
-    "lesson": "Schedulers guarantee at-least-once, not exactly-once. Any job with side effects needs its own lock keyed on the logical work unit."
+    "lesson": "Schedulers guarantee at-least-once, not exactly-once. Any job with side effects needs its own lock keyed on the logical work unit.",
+    "occurred_at": "2026-04-27T14:30:00Z"
   }
 ]

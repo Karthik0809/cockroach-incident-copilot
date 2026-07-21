@@ -27,7 +27,10 @@ def main() -> None:
         if lesson:
             # Seeded lessons start well-trusted; they came from real postmortems.
             memory.remember_lesson(incident_id, lesson, confidence=0.75)
-        print(f"  + {record['external_id']}  {record['title']}")
+        print(
+            f"  + {record['external_id']}  {record['occurred_at'][:10]}  "
+            f"{record['title']}"
+        )
 
     print("done:", memory.stats())
 

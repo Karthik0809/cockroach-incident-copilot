@@ -9,7 +9,7 @@ Parameters:
     Description: CockroachDB Cloud connection string (postgresql://...)
   ChatModelId:
     Type: String
-    Default: us.anthropic.claude-sonnet-5
+    Default: us.amazon.nova-pro-v1:0
   EmbedModelId:
     Type: String
     Default: amazon.titan-embed-text-v2:0

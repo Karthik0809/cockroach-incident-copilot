@@ -124,7 +124,7 @@ guidance on query/schema design.
 
 | Service | Role |
 |---|---|
-| **Amazon Bedrock** — Claude Sonnet 5 | The reasoning loop, with native tool use over the memory tools ([`src/agent.py`](src/agent.py)) |
+| **Amazon Bedrock Converse API** | The reasoning loop, with native tool use over the memory tools ([`src/agent.py`](src/agent.py)). Model-agnostic — runs on Amazon Nova Pro or Claude by changing one env var |
 | **Amazon Bedrock** — Titan Embed Text V2 | 1024-dim embeddings for every incident and lesson ([`src/embeddings.py`](src/embeddings.py)) |
 | **AWS Lambda** | Serverless agent execution behind a Function URL ([`src/lambda_handler.py`](src/lambda_handler.py)) |
 | **Amazon ECS Fargate** | Hosts the Streamlit demo UI ([`Dockerfile`](Dockerfile)) |

@@ -142,8 +142,15 @@ def remember_incident(
     root_cause: str | None = None,
     resolution: str | None = None,
     external_id: str | None = None,
+    occurred_at: datetime | str | None = None,
 ) -> str:
-    """Write an incident and its embedding in a single transaction."""
+    """Write an incident and its embedding in a single transaction.
+
+    `occurred_at` overrides created_at so seeded history lands on the dates it
+    actually happened. Without it every "past" incident is stamped with now(),
+    and an agent citing a memory from four seconds ago is not demonstrating
+    memory at all.
+    """
     vec = to_pgvector(embed(_incident_text(title, service, symptoms, root_cause)))
     # Decided in Python, not in SQL. The previous `CASE WHEN %s IS NULL` form
     # gave the planner a placeholder with no inferable type and failed with
@@ -155,12 +162,14 @@ def remember_incident(
             """
             INSERT INTO incidents
                 (external_id, title, service, severity, symptoms,
-                 root_cause, resolution, resolved_at, embedding)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::VECTOR)
+                 root_cause, resolution, resolved_at, embedding, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::VECTOR,
+                    coalesce(%s::TIMESTAMPTZ, now()))
             ON CONFLICT (external_id) DO UPDATE SET
                 root_cause = excluded.root_cause,
                 resolution = excluded.resolution,
-                embedding  = excluded.embedding
+                embedding  = excluded.embedding,
+                created_at = excluded.created_at
             RETURNING id
             """,
             (
@@ -173,6 +182,7 @@ def remember_incident(
                 resolution,
                 resolved_at,
                 vec,
+                occurred_at,
             ),
         ).fetchone()
     return str(row["id"])

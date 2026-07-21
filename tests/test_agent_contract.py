@@ -44,3 +44,32 @@ def test_unknown_tool_does_not_raise():
     """The model occasionally hallucinates a tool name; we must return a
     result block rather than blow up the whole session."""
     assert "Unknown tool" in agent._run_tool("nope", {}, "session-id")
+
+
+def test_tool_config_matches_the_converse_api_shape():
+    """The Converse API nests differently from invoke_model: toolSpec, and
+    inputSchema wrapped in a `json` key. Getting this wrong is a silent
+    ValidationException at runtime, not a startup error."""
+    cfg = agent._tool_config()
+    assert set(cfg) == {"tools"}
+    for entry in cfg["tools"]:
+        spec = entry["toolSpec"]
+        assert set(spec) == {"name", "description", "inputSchema"}
+        assert set(spec["inputSchema"]) == {"json"}
+        assert spec["inputSchema"]["json"]["type"] == "object"
+    assert {e["toolSpec"]["name"] for e in cfg["tools"]} == TOOL_NAMES
+
+
+def test_thinking_tags_are_stripped_from_the_answer():
+    """Nova narrates its planning inline; on-call engineers should not see it."""
+    raw = "<thinking>let me search memory first</thinking>\nCheck pool utilization."
+    assert agent.strip_thinking(raw) == "Check pool utilization."
+
+
+def test_stripping_is_multiline_and_case_insensitive():
+    raw = "<Thinking>\nline one\nline two\n</Thinking>Answer."
+    assert agent.strip_thinking(raw) == "Answer."
+
+
+def test_text_without_thinking_is_untouched():
+    assert agent.strip_thinking("Just the answer.") == "Just the answer."

@@ -26,7 +26,7 @@
         { "name": "AWS_REGION", "value": "REGION" },
         {
           "name": "CHAT_MODEL_ID",
-          "value": "us.anthropic.claude-sonnet-5"
+          "value": "us.amazon.nova-pro-v1:0"
         },
         { "name": "EMBED_MODEL_ID", "value": "amazon.titan-embed-text-v2:0" },
         { "name": "EMBED_DIMS", "value": "1024" }
