@@ -59,9 +59,18 @@ def test_schema_statements_split_cleanly():
     sql = (ROOT / "schema" / "001_schema.sql").read_text(encoding="utf-8")
     statements = split_statements(sql)
 
-    assert len(statements) >= 8
+    # 5 tables + 2 vector indexes
+    assert len(statements) == 7
     for statement in statements:
-        assert statement.upper().startswith(("CREATE", "SET")), statement[:60]
+        assert statement.upper().startswith("CREATE"), statement[:60]
+
+
+def test_schema_does_not_set_the_removed_preview_flag():
+    """`SET enable_vector_index` existed only in preview builds; on current
+    CockroachDB it errors with 'unrecognized configuration parameter'."""
+    sql = (ROOT / "schema" / "001_schema.sql").read_text(encoding="utf-8")
+    active = "\n".join(ln for ln in sql.splitlines() if not ln.strip().startswith("--"))
+    assert "enable_vector_index" not in active
 
 
 def test_splitter_survives_a_semicolon_inside_a_comment():

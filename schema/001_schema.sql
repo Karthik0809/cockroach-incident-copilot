@@ -6,7 +6,9 @@
 -- No separate vector store, so a resolution and its embedding commit in the same
 -- transaction and can never drift apart.
 
-SET enable_vector_index = on;
+-- Verified against CockroachDB v26.2.1, where vector indexing is GA. Earlier
+-- preview builds needed `SET enable_vector_index = on` first; on current
+-- versions that session variable no longer exists and setting it errors.
 
 ------------------------------------------------------------------------------
 -- 1. EPISODIC MEMORY :: raw incidents the agent has lived through
