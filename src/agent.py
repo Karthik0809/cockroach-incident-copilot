@@ -171,6 +171,8 @@ def handle_alert(
 
     messages: list[dict[str, Any]] = [{"role": "user", "content": alert_text}]
     tools_used: list[str] = []
+    said: list[str] = []
+    finished = False
 
     for _ in range(max_turns):
         reply = _invoke(messages)
@@ -179,8 +181,10 @@ def handle_alert(
         for block in reply["content"]:
             if block["type"] == "text" and block["text"].strip():
                 memory.append_step(session_id, "assistant", block["text"])
+                said.append(block["text"])
 
         if reply.get("stop_reason") != "tool_use":
+            finished = True
             break
 
         results = []
@@ -201,16 +205,14 @@ def handle_alert(
             )
         messages.append({"role": "user", "content": results})
 
-    memory.close_session(session_id)
+    # Accumulate text as it arrives rather than reading it off the last
+    # message: when max_turns runs out, the last message is a tool_result,
+    # and reading that back would silently return an empty answer.
+    memory.close_session(session_id, "resolved" if finished else "truncated")
 
-    answer = (
-        "\n".join(
-            b["text"]
-            for b in messages[-1]["content"]
-            if isinstance(b, dict) and b.get("type") == "text"
-        )
-        if isinstance(messages[-1]["content"], list)
-        else ""
-    )
-
-    return {"session_id": session_id, "answer": answer, "tools_used": tools_used}
+    return {
+        "session_id": session_id,
+        "answer": "\n\n".join(said),
+        "tools_used": tools_used,
+        "truncated": not finished,
+    }

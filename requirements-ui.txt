@@ -1,0 +1,3 @@
+# Demo UI (ECS Fargate / local). Not packaged into the Lambda.
+-r requirements.txt
+streamlit>=1.40.0

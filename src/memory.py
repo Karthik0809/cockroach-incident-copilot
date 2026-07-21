@@ -85,11 +85,48 @@ class Lesson:
 # ------------------------------------------------------------------- schema io
 
 
+def split_statements(script: str) -> list[str]:
+    """Split a SQL script into statements.
+
+    Comments are stripped *before* splitting, because a `--` comment may
+    legitimately contain a semicolon and a naive split would sever the
+    statement around it -- producing a fragment that fails to parse with an
+    error pointing nowhere near the real cause.
+    """
+    lines = []
+    for line in script.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("--"):
+            continue
+        if "--" in line:
+            line = line.split("--", 1)[0]
+        lines.append(line)
+    return [s.strip() for s in "\n".join(lines).split(";") if s.strip()]
+
+
 def init_schema(sql_path: str) -> None:
+    """Apply the schema one statement at a time, in autocommit.
+
+    Deliberately not a single multi-statement execute: CockroachDB restricts
+    what DDL may share a transaction, and a session-level SET cannot be batched
+    with the DDL that depends on it. One statement per round trip is slower and
+    far more debuggable -- a failure names the statement that failed.
+    """
     with open(sql_path, encoding="utf-8") as fh:
-        ddl = fh.read()
-    with connect() as conn:
-        conn.execute(ddl)
+        script = fh.read()
+
+    statements = split_statements(script)
+
+    conn = psycopg.connect(config.require_database_url(), autocommit=True)
+    try:
+        for statement in statements:
+            try:
+                conn.execute(statement)
+            except Exception as exc:
+                first_line = statement.splitlines()[0][:70]
+                raise RuntimeError(f"failed on: {first_line}...\n  {exc}") from exc
+    finally:
+        conn.close()
 
 
 # --------------------------------------------------------------- write memory

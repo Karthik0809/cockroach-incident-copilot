@@ -14,7 +14,7 @@ help:
 	@echo "deploy   deploy the Lambda via SAM"
 
 install:
-	pip install -r requirements.txt
+	pip install -r requirements-ui.txt
 	pip install ruff pytest
 
 init:

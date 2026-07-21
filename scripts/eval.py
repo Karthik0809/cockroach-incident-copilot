@@ -37,7 +37,7 @@ def _external_ids(hits: list[memory.Recollection]) -> list[str]:
         return []
     with memory.connect() as conn:
         rows = conn.execute(
-            "SELECT id, external_id FROM incidents WHERE id = ANY(%s)",
+            "SELECT id, external_id FROM incidents WHERE id = ANY(%s::uuid[])",
             ([h.incident_id for h in hits],),
         ).fetchall()
     by_id = {str(r["id"]): r["external_id"] for r in rows}

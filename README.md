@@ -147,7 +147,7 @@ git clone https://github.com/Karthik0809/cockroach-incident-copilot
 cd cockroach-incident-copilot
 
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements-ui.txt
 
 cp .env.example .env        # paste your DATABASE_URL, set AWS_REGION
 
@@ -226,12 +226,18 @@ claude   # then: "show the 10 most recent recall_events joined to incidents"
 ## Development
 
 ```bash
-make test    # 30 tests -- no database or AWS credentials required
+make test    # 38 tests -- no database or AWS credentials required
 make lint    # ruff check + format check
 ```
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, format
 check, tests, `sam validate --lint`, and a Docker build on every push.
+
+**Dependencies are split on purpose.** `requirements.txt` is what SAM packages
+into the Lambda; `requirements-ui.txt` adds Streamlit for the UI. Streamlit's
+tree (pyarrow, pandas, numpy, altair, pydeck, PIL) is ~260MB unzipped — over
+Lambda's 250MB limit on its own — so a UI dependency leaking into the core file
+breaks the deploy. CI and `tests/test_packaging.py` both fail if it does.
 
 ---
 
@@ -265,8 +271,10 @@ scripts/demo.py                  one full agent run, end to end
 scripts/eval.py                  recall quality benchmark
 data/incidents.json              8 seed incidents with root causes and lessons
 data/eval_alerts.json            10 eval alerts, 2 of them controls
-tests/                           30 tests, no DB or AWS creds needed
+tests/                           38 tests, no DB or AWS creds needed
 app/streamlit_app.py             demo UI: run, search, replay, give feedback
+requirements.txt                 core deps -- what SAM packages into the Lambda
+requirements-ui.txt              UI deps, kept out of the Lambda (see below)
 Dockerfile                       UI image (non-root, healthchecked)
 infra/template.yaml              SAM template for the Lambda
 infra/ecs-task-definition.json   Fargate task definition for the UI
