@@ -1,6 +1,6 @@
 """Create the schema. Run once against a fresh CockroachDB cluster.
 
-    python -m scripts.init_db
+python -m scripts.init_db
 """
 
 import pathlib

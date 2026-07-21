@@ -142,7 +142,7 @@ def _run_tool(name: str, args: dict[str, Any], session_id: str) -> str:
         if not lessons:
             return "No lessons recorded yet."
         return "\n".join(
-            f"- {l.statement}  (confidence {l.confidence:.2f})" for l in lessons
+            f"- {x.statement}  (confidence {x.confidence:.2f})" for x in lessons
         )
 
     if name == "record_finding":
@@ -203,9 +203,14 @@ def handle_alert(
 
     memory.close_session(session_id)
 
-    answer = "\n".join(
-        b["text"] for b in messages[-1]["content"]
-        if isinstance(b, dict) and b.get("type") == "text"
-    ) if isinstance(messages[-1]["content"], list) else ""
+    answer = (
+        "\n".join(
+            b["text"]
+            for b in messages[-1]["content"]
+            if isinstance(b, dict) and b.get("type") == "text"
+        )
+        if isinstance(messages[-1]["content"], list)
+        else ""
+    )
 
     return {"session_id": session_id, "answer": answer, "tools_used": tools_used}

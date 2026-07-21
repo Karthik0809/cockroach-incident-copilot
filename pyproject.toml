@@ -1,0 +1,20 @@
+[project]
+name = "incident-copilot"
+version = "0.1.0"
+description = "On-call agent with persistent agentic memory in CockroachDB, running on AWS Bedrock + Lambda"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# Tests reach into private helpers on purpose; agent.py builds long prompts.
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

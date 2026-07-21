@@ -1,0 +1,61 @@
+{
+  "family": "incident-copilot-ui",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/incidentCopilotTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "ui",
+      "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/incident-copilot:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8501,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        { "name": "AWS_REGION", "value": "REGION" },
+        {
+          "name": "CHAT_MODEL_ID",
+          "value": "us.anthropic.claude-sonnet-5-20250929-v1:0"
+        },
+        { "name": "EMBED_MODEL_ID", "value": "amazon.titan-embed-text-v2:0" },
+        { "name": "EMBED_DIMS", "value": "1024" }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:incident-copilot/database-url"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')\" || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 30
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/incident-copilot",
+          "awslogs-region": "REGION",
+          "awslogs-stream-prefix": "ui",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ]
+}

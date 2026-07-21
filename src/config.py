@@ -12,7 +12,9 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "")
 # AWS / Bedrock
 AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
 EMBED_MODEL_ID = os.environ.get("EMBED_MODEL_ID", "amazon.titan-embed-text-v2:0")
-CHAT_MODEL_ID = os.environ.get("CHAT_MODEL_ID", "us.anthropic.claude-sonnet-5-20250929-v1:0")
+CHAT_MODEL_ID = os.environ.get(
+    "CHAT_MODEL_ID", "us.anthropic.claude-sonnet-5-20250929-v1:0"
+)
 
 EMBED_DIMS = int(os.environ.get("EMBED_DIMS", "1024"))
 

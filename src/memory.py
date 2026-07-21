@@ -15,15 +15,15 @@ semantic index disagrees with the system of record.
 from __future__ import annotations
 
 import contextlib
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Iterator
+from typing import Any
 
 import psycopg
 from psycopg.rows import dict_row
 
 from . import config
 from .embeddings import embed, to_pgvector
-
 
 # ---------------------------------------------------------------- connections
 

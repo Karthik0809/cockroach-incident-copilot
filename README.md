@@ -130,12 +130,48 @@ Then the UI:
 streamlit run app/streamlit_app.py
 ```
 
-### Deploy to AWS
+### Inspect memory from Claude Code (MCP)
+
+[`.mcp.json`](.mcp.json) is checked in, so the CockroachDB Cloud managed MCP
+server is available the moment you open this repo in Claude Code or Cursor:
+
+```bash
+export CC_API_KEY="<read-only service account key from the Cloud Console>"
+claude   # then ask: "show the 10 most recent recall_events joined to incidents"
+```
+
+Read-only by design — see [`mcp/README.md`](mcp/README.md).
+
+### Deploy the agent (Lambda)
 
 ```bash
 sam build -t infra/template.yaml
 sam deploy --guided --parameter-overrides DatabaseUrl="$DATABASE_URL"
 ```
+
+### Deploy the demo UI (ECS Fargate)
+
+```bash
+aws secretsmanager create-secret \
+  --name incident-copilot/database-url --secret-string "$DATABASE_URL"
+
+AWS_ACCOUNT_ID=123456789012 AWS_REGION=us-east-1 ./infra/deploy-ui.sh
+```
+
+Builds the [`Dockerfile`](Dockerfile), pushes to ECR, registers
+[`infra/ecs-task-definition.json`](infra/ecs-task-definition.json), and waits for
+the service to stabilize. `DATABASE_URL` arrives via Secrets Manager — it is
+never baked into the image.
+
+### Tests
+
+```bash
+pytest        # 21 tests, no database or AWS credentials required
+ruff check .
+```
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, format
+check, tests, `sam validate --lint`, and a Docker build on every push.
 
 The stack outputs a Function URL:
 
@@ -163,16 +199,21 @@ that changed was the database.
 ## Layout
 
 ```
-src/memory.py          the memory layer -- all four memory types
-src/agent.py           Bedrock tool-use loop: recall -> reason -> write back
-src/embeddings.py      Titan embeddings
-src/lambda_handler.py  AWS Lambda entry point
-schema/001_schema.sql  tables + distributed vector indexes
-scripts/               init_db, seed, demo
-app/streamlit_app.py   demo UI
-infra/template.yaml    SAM template
-mcp/                   MCP server setup + how it was used
-docs/architecture.md   diagram and data flow
+src/memory.py                    the memory layer -- all four memory types
+src/agent.py                     Bedrock tool-use loop: recall -> reason -> write back
+src/embeddings.py                Titan embeddings
+src/lambda_handler.py            AWS Lambda entry point
+schema/001_schema.sql            tables + distributed vector indexes
+scripts/                         init_db, seed, demo
+app/streamlit_app.py             demo UI
+tests/                           21 tests, no DB or AWS creds needed
+Dockerfile                       demo UI image (non-root, healthchecked)
+infra/template.yaml              SAM template for the Lambda
+infra/ecs-task-definition.json   Fargate task def for the UI
+infra/deploy-ui.sh               build -> ECR -> ECS rollout
+.mcp.json                        CockroachDB managed MCP server, read-only
+mcp/                             MCP setup + the prompts we actually used
+docs/architecture.md             diagram and data flow
 ```
 
 ## License

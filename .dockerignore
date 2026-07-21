@@ -1,0 +1,13 @@
+.git/
+.github/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.aws-sam/
+tests/
+docs/
+infra/
+mcp/
+*.md

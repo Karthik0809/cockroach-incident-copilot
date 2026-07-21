@@ -95,8 +95,6 @@ with tab_replay:
             st.write(f"**Alert:** {found['alert_text']}")
             st.write(f"**Status:** {found['status']}")
             for step in found["steps"]:
-                with st.chat_message(
-                    "assistant" if step["role"] != "user" else "user"
-                ):
+                with st.chat_message("assistant" if step["role"] != "user" else "user"):
                     st.caption(f"step {step['step_no']} · {step['role']}")
                     st.write(step["content"])

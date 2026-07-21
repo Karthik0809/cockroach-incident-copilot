@@ -1,7 +1,7 @@
 """End-to-end demo from the terminal. Good material for the submission video.
 
-    python -m scripts.demo
-    python -m scripts.demo "your own alert text here"
+python -m scripts.demo
+python -m scripts.demo "your own alert text here"
 """
 
 import pathlib
