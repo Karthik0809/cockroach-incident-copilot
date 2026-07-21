@@ -17,8 +17,6 @@ import re
 from functools import lru_cache
 from typing import Any
 
-import boto3
-
 from . import config, memory
 
 # Some Bedrock models (Nova especially) narrate their planning inside
@@ -135,7 +133,8 @@ def _tool_config() -> dict[str, Any]:
 
 @lru_cache(maxsize=1)
 def _client():
-    return boto3.client("bedrock-runtime", region_name=config.AWS_REGION)
+    # Via config.aws_session() so the profile guard applies here too.
+    return config.aws_session().client("bedrock-runtime")
 
 
 def _converse(messages: list[dict[str, Any]]) -> dict[str, Any]:

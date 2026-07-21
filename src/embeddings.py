@@ -3,14 +3,13 @@
 import json
 from functools import lru_cache
 
-import boto3
-
 from . import config
 
 
 @lru_cache(maxsize=1)
 def _client():
-    return boto3.client("bedrock-runtime", region_name=config.AWS_REGION)
+    # Via config.aws_session() so the profile guard applies here too.
+    return config.aws_session().client("bedrock-runtime")
 
 
 def embed(text: str) -> list[float]:

@@ -48,11 +48,19 @@ ccloud cluster sql incident-copilot --connection-string
    Approval is usually instant but is **per-region** — this is the second most
    common stumble. If you get `AccessDeniedException` on `InvokeModel`, you
    enabled the model in a different region than `AWS_REGION`.
-3. Local credentials:
+3. Local credentials, **under a named profile**:
    ```bash
-   aws configure          # or export AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
-   aws sts get-caller-identity     # confirm it works
+   aws configure --profile personal
+   aws sts get-caller-identity --profile personal    # confirm WHICH account
    ```
+   Then set `AWS_PROFILE=personal` in `.env`.
+
+   > **Why this is mandatory.** A bare `aws configure` writes to `[default]`,
+   > and boto3 silently uses `[default]` when nothing else is specified. On a
+   > work laptop that is usually your employer's account — so a personal
+   > project bills the company and runs under a corporate identity, invisibly.
+   > This project raises a `RuntimeError` instead of guessing. If the default
+   > profile genuinely is the right one, set `AWS_ALLOW_DEFAULT_PROFILE=1`.
 
 ## 3. Local run
 
@@ -131,7 +139,9 @@ The ALB DNS name is your **public demo URL** for the submission.
 
 | Symptom | Cause |
 |---|---|
+| `AWS_PROFILE is not set` | Intentional — set a named profile, see step 3 |
 | `AccessDeniedException` on InvokeModel | Model not enabled in `AWS_REGION` |
+| `INVALID_PAYMENT_INSTRUMENT` | Anthropic models need an AWS Marketplace subscription + valid billing; Amazon first-party models (Nova, Titan) do not |
 | `relation "incidents" does not exist` | `scripts/init_db.py` never ran, or ran against a different database |
 | `syntax error at or near "VECTOR"` | Cluster version predates vector index support |
 | Recall returns nothing for everything | `RECALL_MAX_DISTANCE` too low, or `scripts/seed.py` never ran |
