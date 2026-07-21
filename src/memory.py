@@ -17,6 +17,7 @@ from __future__ import annotations
 import contextlib
 from collections.abc import Iterator
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 
 import psycopg
@@ -144,14 +145,18 @@ def remember_incident(
 ) -> str:
     """Write an incident and its embedding in a single transaction."""
     vec = to_pgvector(embed(_incident_text(title, service, symptoms, root_cause)))
+    # Decided in Python, not in SQL. The previous `CASE WHEN %s IS NULL` form
+    # gave the planner a placeholder with no inferable type and failed with
+    # "could not determine data type of placeholder".
+    resolved_at = datetime.now(UTC) if resolution else None
+
     with connect() as conn:
         row = conn.execute(
             """
             INSERT INTO incidents
                 (external_id, title, service, severity, symptoms,
                  root_cause, resolution, resolved_at, embedding)
-            VALUES (%s, %s, %s, %s, %s, %s, %s,
-                    CASE WHEN %s IS NULL THEN NULL ELSE now() END, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::VECTOR)
             ON CONFLICT (external_id) DO UPDATE SET
                 root_cause = excluded.root_cause,
                 resolution = excluded.resolution,
@@ -166,7 +171,7 @@ def remember_incident(
                 symptoms,
                 root_cause,
                 resolution,
-                resolution,
+                resolved_at,
                 vec,
             ),
         ).fetchone()
@@ -179,7 +184,7 @@ def remember_lesson(incident_id: str, statement: str, confidence: float = 0.6) -
         row = conn.execute(
             """
             INSERT INTO lessons (incident_id, statement, confidence, embedding)
-            VALUES (%s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s::VECTOR)
             RETURNING id
             """,
             (incident_id, statement, confidence, vec),
@@ -200,7 +205,7 @@ def recall_incidents(
     sql = """
         SELECT id, title, service, severity, symptoms, root_cause,
                resolution, created_at,
-               embedding <=> %s AS distance
+               embedding <=> %s::VECTOR AS distance
         FROM incidents
         WHERE embedding IS NOT NULL
     """
@@ -208,7 +213,7 @@ def recall_incidents(
     if service:
         sql += " AND service = %s"
         params.append(service)
-    sql += " ORDER BY embedding <=> %s LIMIT %s"
+    sql += " ORDER BY embedding <=> %s::VECTOR LIMIT %s"
     params.extend([vec, k])
 
     with connect() as conn:
@@ -242,10 +247,10 @@ def recall_lessons(query: str, k: int = 3) -> list[Lesson]:
     with connect() as conn:
         rows = conn.execute(
             """
-            SELECT id, statement, confidence, embedding <=> %s AS distance
+            SELECT id, statement, confidence, embedding <=> %s::VECTOR AS distance
             FROM lessons
             WHERE embedding IS NOT NULL
-            ORDER BY (embedding <=> %s) - (confidence * 0.15)
+            ORDER BY (embedding <=> %s::VECTOR) - (confidence * 0.15)
             LIMIT %s
             """,
             (vec, vec, k),

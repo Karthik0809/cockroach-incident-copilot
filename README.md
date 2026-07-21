@@ -171,12 +171,30 @@ overlap can't carry it.
 make eval
 ```
 
+Measured against a live CockroachDB v26.2.1 cluster with Titan Embed V2:
+
 ```
-  recall@1     …
-  recall@k     …
-  MRR          …
-  abstention   …
+  recall@1     88%     correct incident is the top hit
+  recall@k     88%
+  MRR          0.875
+  abstention   100%    both controls correctly returned nothing
 ```
+
+**The threshold is measured, not guessed.** The correct incident ranks #1 in
+**8/8** cases — ranking was never the problem. But correct answers sit at cosine
+distance 0.426–0.795, the nearest *wrong* answer at 0.543–0.871, and the two
+control alerts at 0.710 and 0.821. Those distributions overlap, so the cutoff is
+a real tradeoff:
+
+| `RECALL_MAX_DISTANCE` | recall@1 | controls leaked |
+|---|---|---|
+| 0.45 (naive default) | 2/8 | 0/2 |
+| 0.55 | 5/8 | 0/2 |
+| **0.70 (shipped)** | **7/8** | **0/2** |
+| 0.80 | 8/8 | 1/2 |
+
+0.80 would score a perfect recall@1 — and start inventing precedents for alerts
+with no history. For an agent waking someone at 3am, that's the wrong trade.
 
 Two of the ten are **control cases with no correct answer**. Those matter most:
 a memory system that returns something confident for "the espresso machine is
