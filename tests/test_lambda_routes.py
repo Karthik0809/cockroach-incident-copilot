@@ -20,6 +20,14 @@ def stub_backends(monkeypatch):
         lambda sid: {"id": sid, "steps": []} if sid == "known" else None,
     )
     monkeypatch.setattr(
+        lambda_handler.memory,
+        "session_recalls",
+        lambda sid: [{"id": "r1", "similarity": 0.88, "was_helpful": None}],
+    )
+    monkeypatch.setattr(
+        lambda_handler.memory, "mark_recall_helpful", lambda rid, helpful: None
+    )
+    monkeypatch.setattr(
         lambda_handler.agent,
         "handle_alert",
         lambda alert, service=None: {
@@ -75,6 +83,31 @@ def test_session_route_returns_the_trace():
     res = lambda_handler.handler(_event("/session", query={"id": "known"}), None)
     assert res["statusCode"] == 200
     assert _body(res)["id"] == "known"
+
+
+def test_recalls_route_lists_what_fired():
+    res = lambda_handler.handler(_event("/recalls", query={"id": "known"}), None)
+    assert res["statusCode"] == 200
+    assert _body(res)["recalls"][0]["similarity"] == 0.88
+
+
+def test_recalls_route_requires_an_id():
+    assert lambda_handler.handler(_event("/recalls"), None)["statusCode"] == 400
+
+
+def test_feedback_route_accepts_a_verdict():
+    res = lambda_handler.handler(
+        _event("/feedback", "POST", {"recall_event_id": "r1", "helpful": True}), None
+    )
+    assert res["statusCode"] == 200
+    assert _body(res)["ok"] is True
+
+
+def test_feedback_route_rejects_a_partial_payload():
+    res = lambda_handler.handler(
+        _event("/feedback", "POST", {"recall_event_id": "r1"}), None
+    )
+    assert res["statusCode"] == 400
 
 
 def test_unknown_route_404s():

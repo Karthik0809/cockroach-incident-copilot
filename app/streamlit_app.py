@@ -98,3 +98,34 @@ with tab_replay:
                 with st.chat_message("assistant" if step["role"] != "user" else "user"):
                     st.caption(f"step {step['step_no']} · {step['role']}")
                     st.write(step["content"])
+
+            st.divider()
+            st.subheader("Was the recall any good?")
+            st.caption(
+                "This is the loop. Marking a memory helpful raises its "
+                "confidence; marking it unhelpful lowers it, and it sinks in "
+                "future retrievals."
+            )
+
+            recalls = memory.session_recalls(session_id.strip())
+            if not recalls:
+                st.info("No memories fired during this session.")
+
+            for rec in recalls:
+                label = rec["lesson_statement"] or rec["incident_title"] or "(deleted)"
+                cols = st.columns([6, 1, 1])
+                with cols[0]:
+                    st.write(f"{label}")
+                    st.caption(f"similarity {rec['similarity']:.2f}")
+                with cols[1]:
+                    if st.button("👍", key=f"up-{rec['id']}"):
+                        memory.mark_recall_helpful(str(rec["id"]), True)
+                        st.rerun()
+                with cols[2]:
+                    if st.button("👎", key=f"down-{rec['id']}"):
+                        memory.mark_recall_helpful(str(rec["id"]), False)
+                        st.rerun()
+                if rec["was_helpful"] is not None:
+                    st.caption(
+                        "marked helpful" if rec["was_helpful"] else "marked unhelpful"
+                    )

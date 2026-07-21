@@ -1,9 +1,12 @@
 """AWS Lambda entry point (behind a Function URL or API Gateway).
 
 Routes:
-  POST /alert       {"alert": "...", "service": "..."}  -> run the agent
-  GET  /session     ?id=<uuid>                          -> replay memory
-  GET  /stats                                           -> memory counters
+  POST /alert       {"alert": "...", "service": "..."}   -> run the agent
+  GET  /session     ?id=<uuid>                           -> replay memory
+  GET  /recalls     ?id=<uuid>                           -> memories that fired
+  POST /feedback    {"recall_event_id": "...",
+                     "helpful": true}                    -> reinforce or decay
+  GET  /stats                                            -> memory counters
 """
 
 import json
@@ -43,6 +46,19 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             if not found:
                 return _response(404, {"error": "no such session"})
             return _response(200, found)
+
+        if path.endswith("/feedback") and method == "POST":
+            body = json.loads(event.get("body") or "{}")
+            if "recall_event_id" not in body or "helpful" not in body:
+                return _response(400, {"error": "need 'recall_event_id' and 'helpful'"})
+            memory.mark_recall_helpful(body["recall_event_id"], bool(body["helpful"]))
+            return _response(200, {"ok": True})
+
+        if path.endswith("/recalls"):
+            session_id = (event.get("queryStringParameters") or {}).get("id")
+            if not session_id:
+                return _response(400, {"error": "missing ?id="})
+            return _response(200, {"recalls": memory.session_recalls(session_id)})
 
         if path.endswith("/alert") and method == "POST":
             body = json.loads(event.get("body") or "{}")

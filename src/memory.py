@@ -302,6 +302,26 @@ def log_recall(
     return str(row["id"])
 
 
+def session_recalls(session_id: str) -> list[dict[str, Any]]:
+    """Every memory that fired during a session, with whatever the lesson or
+    incident actually said, so a human can judge whether it deserved to fire."""
+    with connect() as conn:
+        return conn.execute(
+            """
+            SELECT r.id, r.similarity, r.was_helpful,
+                   i.title      AS incident_title,
+                   l.statement  AS lesson_statement,
+                   l.confidence AS lesson_confidence
+            FROM recall_events r
+            LEFT JOIN incidents i ON i.id = r.incident_id
+            LEFT JOIN lessons   l ON l.id = r.lesson_id
+            WHERE r.session_id = %s
+            ORDER BY r.similarity DESC
+            """,
+            (session_id,),
+        ).fetchall()
+
+
 def mark_recall_helpful(recall_event_id: str, helpful: bool) -> None:
     """Human feedback closes the loop: a confirmed lesson gains confidence,
     a refuted one loses it, and future retrievals reflect that."""

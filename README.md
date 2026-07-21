@@ -2,7 +2,11 @@
 
 **An on-call agent whose memory lives in CockroachDB — and gets better every time it's used.**
 
-Submission for the CockroachDB × AWS Hackathon: *Build with Agentic Memory*.
+[![CI](https://github.com/Karthik0809/cockroach-incident-copilot/actions/workflows/ci.yml/badge.svg)](https://github.com/Karthik0809/cockroach-incident-copilot/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
+
+Submission for the **CockroachDB × AWS Hackathon: Build with Agentic Memory**.
 
 ---
 
@@ -17,10 +21,10 @@ handles production alerts, and **it is useless without its memory**. Its entire
 value is knowing what *this specific team* saw the last time something looked
 like this:
 
-> "This matches INC-1041 from 2024-11-08 — checkout-api, same signature: latency
-> climbing while CPU stays flat. That was connection pool exhaustion from a retry
-> that leaked a connection on the timeout path. You shipped a retry wrapper to
-> orders-api nine days ago. Check pool utilization first."
+> This matches **INC-1041** from 2024-11-08 — `checkout-api`, same signature:
+> latency climbing while CPU stays flat. That was connection pool exhaustion
+> from a retry that leaked a connection on the timeout path. You shipped a retry
+> wrapper to `orders-api` nine days ago. **Check pool utilization first.**
 
 Then it writes what it learned back, so the next engineer gets that for free.
 
@@ -33,17 +37,24 @@ Then it writes what it learned back, so the next engineer gets that for free.
 | **Working** | `sessions`, `session_steps` | What the agent is doing *right now*, durably |
 | **Meta** | `recall_events` | Which memories fired, and whether they helped |
 
-The last one is what makes it a loop instead of a lookup. Every retrieval is
-recorded; human feedback raises or lowers a lesson's `confidence`; and
-`recall_lessons` ranks by similarity **and** trust. Bad memories decay. Good ones
-get stickier.
+The fourth is what makes this a **loop** instead of a lookup. Every retrieval is
+recorded. Human thumbs-up/down adjusts a lesson's `confidence`, and recall ranks
+by similarity **and** trust:
+
+```sql
+ORDER BY (embedding <=> $1) - (confidence * 0.15)
+```
+
+Bad memories decay. Good ones get stickier. A memory system without this just
+accumulates.
 
 ## Why CockroachDB specifically
 
 - **Vectors and rows commit in one transaction.** A resolution and its embedding
   are written together. With a bolted-on vector store there is always a window
   where the index disagrees with the system of record — and an agent retrieving
-  during that window recalls something that isn't true.
+  during that window recalls something that isn't true. That is a correctness
+  problem, not a performance one.
 - **Working memory outlives the process.** Serverless agents get killed
   mid-reasoning. Steps are appended durably, so a session is resumable and
   auditable rather than lost with the container.
@@ -53,13 +64,26 @@ get stickier.
 
 ## Architecture
 
-Full diagram and data flow: [`docs/architecture.md`](docs/architecture.md).
+```
+                  ┌──────────── AWS ────────────┐
+  alert ─────────▶│  Lambda                     │
+                  │    │                        │
+                  │    ├─▶ Bedrock: Titan  ─── embed
+                  │    ├─▶ Bedrock: Claude ─── reason (tool use)
+                  │    └─▶ S3            ─── postmortems
+                  └────┬────────────────────────┘
+                       │  recall (vector index)  ▲
+                       ▼                         │ record_finding
+              ┌──── CockroachDB Cloud ───────────┴──┐
+              │  incidents · lessons                │
+              │  sessions · session_steps           │
+              │  recall_events ──▶ confidence feedback
+              └─────────────────────────────────────┘
+                       ▲
+                       └── Claude Code / Cursor, read-only via MCP
+```
 
-```
-alert → Lambda → [ recall via vector index ] → Bedrock (Claude) → answer
-                          ↑                                          ↓
-                  CockroachDB memory  ←──── record_finding (new memory)
-```
+Full diagram and data flow: **[`docs/architecture.md`](docs/architecture.md)**.
 
 ---
 
@@ -81,34 +105,42 @@ no reindexing step, no consistency gap.
 
 ### 2. Cloud Managed MCP Server
 Connected read-only at `https://cockroachlabs.cloud/mcp` and used from Claude
-Code to design and audit the memory layer: reviewing whether `ORDER BY <=>`
-actually hits the vector index, inspecting `recall_events` to check retrieval
-quality, and — the demo moment — watching the agent write a new memory at
-runtime and then querying it back from a completely separate client.
-Setup and the exact prompts used: [`mcp/README.md`](mcp/README.md).
+Code to design and audit the memory layer: verifying `ORDER BY <=>` actually
+hits the vector index, inspecting `recall_events` while tuning thresholds, and —
+the demo moment — watching the agent commit a memory at runtime and then
+querying it back from a completely separate client.
+Config is checked in at [`.mcp.json`](.mcp.json); the exact prompts used are in
+[`mcp/README.md`](mcp/README.md).
 
-### 3. Agent Skills / ccloud CLI *(supporting)*
+### 3. ccloud CLI
+Cluster provisioning and connection-string retrieval during setup — see
+[`docs/SETUP.md`](docs/SETUP.md).
+
+### 4. Agent Skills
 Schema and index design followed the open-source CockroachDB Agent Skills
-guidance on query/schema design; `ccloud` was used to provision the cluster and
-pull connection strings during setup.
+guidance on query/schema design.
 
 ## AWS services used
 
 | Service | Role |
 |---|---|
-| **Amazon Bedrock** — Claude Sonnet 5 | The agent's reasoning loop, with native tool use over the memory tools ([`src/agent.py`](src/agent.py)) |
+| **Amazon Bedrock** — Claude Sonnet 5 | The reasoning loop, with native tool use over the memory tools ([`src/agent.py`](src/agent.py)) |
 | **Amazon Bedrock** — Titan Embed Text V2 | 1024-dim embeddings for every incident and lesson ([`src/embeddings.py`](src/embeddings.py)) |
 | **AWS Lambda** | Serverless agent execution behind a Function URL ([`src/lambda_handler.py`](src/lambda_handler.py)) |
-| **Amazon ECS Fargate** | Hosts the Streamlit demo UI |
+| **Amazon ECS Fargate** | Hosts the Streamlit demo UI ([`Dockerfile`](Dockerfile)) |
 | **Amazon S3** | Postmortem document storage |
+| **AWS Secrets Manager** | `DATABASE_URL` injection — never baked into an image |
 | **AWS SAM / CloudFormation** | Infrastructure as code ([`infra/template.yaml`](infra/template.yaml)) |
 
 ---
 
-## Run it locally
+## Quick start
 
-**Prerequisites:** Python 3.12+, a CockroachDB Cloud cluster (the free tier is
-enough), and AWS credentials with Bedrock model access enabled in your region.
+Full walkthrough with failure modes: **[`docs/SETUP.md`](docs/SETUP.md)**.
+
+**Prerequisites:** Python 3.12+, a CockroachDB Cloud cluster (free tier is
+enough), and AWS credentials with Bedrock model access enabled **in your
+region**.
 
 ```bash
 git clone https://github.com/Karthik0809/cockroach-incident-copilot
@@ -117,39 +149,61 @@ cd cockroach-incident-copilot
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-cp .env.example .env        # paste your DATABASE_URL and set AWS_REGION
+cp .env.example .env        # paste your DATABASE_URL, set AWS_REGION
 
-python -m scripts.init_db   # create tables + vector indexes
-python -m scripts.seed      # embed and store 8 historical incidents
-python -m scripts.demo      # watch the agent recall, reason, and write back
+make init                   # create tables + vector indexes
+make seed                   # embed and store 8 historical incidents
+make eval                   # measure recall quality
+make demo                   # watch the agent recall, reason, and write back
+make ui                     # http://localhost:8501
 ```
 
-Then the UI:
+Every target also works as a plain command — see the [`Makefile`](Makefile).
+
+## Measuring recall quality
+
+Retrieval *is* the product here, so it gets a number instead of a vibe.
+[`scripts/eval.py`](scripts/eval.py) runs 10 alerts, each deliberately worded to
+name a **different service** than the incident it should match — so lexical
+overlap can't carry it.
 
 ```bash
-streamlit run app/streamlit_app.py
+make eval
 ```
 
-### Inspect memory from Claude Code (MCP)
-
-[`.mcp.json`](.mcp.json) is checked in, so the CockroachDB Cloud managed MCP
-server is available the moment you open this repo in Claude Code or Cursor:
-
-```bash
-export CC_API_KEY="<read-only service account key from the Cloud Console>"
-claude   # then ask: "show the 10 most recent recall_events joined to incidents"
+```
+  recall@1     …
+  recall@k     …
+  MRR          …
+  abstention   …
 ```
 
-Read-only by design — see [`mcp/README.md`](mcp/README.md).
+Two of the ten are **control cases with no correct answer**. Those matter most:
+a memory system that returns something confident for "the espresso machine is
+making a grinding noise" is worse than one that says nothing, and precision-only
+scoring would hide that. Tune `RECALL_MAX_DISTANCE` in `.env` and re-run.
 
-### Deploy the agent (Lambda)
+## Deploying
+
+### Agent (Lambda)
 
 ```bash
 sam build -t infra/template.yaml
 sam deploy --guided --parameter-overrides DatabaseUrl="$DATABASE_URL"
+
+curl -X POST "$FUNCTION_URL/alert" -H 'content-type: application/json' \
+  -d '{"alert":"orders-api p99 200ms -> 25s, CPU flat, db CPU normal"}'
 ```
 
-### Deploy the demo UI (ECS Fargate)
+| Route | Purpose |
+|---|---|
+| `POST /alert` | Run the agent on an alert |
+| `GET /session?id=` | Replay a session's full reasoning trace |
+| `GET /recalls?id=` | Which memories fired during that session |
+| `POST /feedback` | Mark a recall helpful/unhelpful — reinforces or decays it |
+| `GET /stats` | Memory counters |
+
+### Demo UI (ECS Fargate)
 
 ```bash
 aws secretsmanager create-secret \
@@ -158,34 +212,32 @@ aws secretsmanager create-secret \
 AWS_ACCOUNT_ID=123456789012 AWS_REGION=us-east-1 ./infra/deploy-ui.sh
 ```
 
-Builds the [`Dockerfile`](Dockerfile), pushes to ECR, registers
-[`infra/ecs-task-definition.json`](infra/ecs-task-definition.json), and waits for
-the service to stabilize. `DATABASE_URL` arrives via Secrets Manager — it is
-never baked into the image.
+Builds the image, pushes to ECR, registers
+[`infra/ecs-task-definition.json`](infra/ecs-task-definition.json), and waits
+for the service to stabilize.
 
-### Tests
+### Inspect memory from Claude Code (MCP)
 
 ```bash
-pytest        # 21 tests, no database or AWS credentials required
-ruff check .
+export CC_API_KEY="<read-only service account key from the Cloud Console>"
+claude   # then: "show the 10 most recent recall_events joined to incidents"
+```
+
+## Development
+
+```bash
+make test    # 30 tests -- no database or AWS credentials required
+make lint    # ruff check + format check
 ```
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, format
 check, tests, `sam validate --lint`, and a Docker build on every push.
 
-The stack outputs a Function URL:
-
-```bash
-curl -X POST "$FUNCTION_URL/alert" \
-  -H 'content-type: application/json' \
-  -d '{"alert":"orders-api p99 200ms -> 25s, CPU flat, db CPU normal"}'
-```
-
 ---
 
 ## The demo worth watching
 
-1. `scripts/seed.py` loads 8 real-shaped historical incidents.
+1. `make seed` loads 8 real-shaped historical incidents.
 2. Send an alert about **orders-api** — a service with *zero* history.
 3. The agent recalls **INC-1041** from `checkout-api` — a different service, but
    the same failure signature — and names connection pool exhaustion.
@@ -196,6 +248,8 @@ curl -X POST "$FUNCTION_URL/alert" \
 Step 6 is the whole point. The agent got better between two runs, and the thing
 that changed was the database.
 
+Shot-by-shot recording plan: [`docs/VIDEO_SCRIPT.md`](docs/VIDEO_SCRIPT.md).
+
 ## Layout
 
 ```
@@ -203,17 +257,26 @@ src/memory.py                    the memory layer -- all four memory types
 src/agent.py                     Bedrock tool-use loop: recall -> reason -> write back
 src/embeddings.py                Titan embeddings
 src/lambda_handler.py            AWS Lambda entry point
+src/config.py                    environment configuration
 schema/001_schema.sql            tables + distributed vector indexes
-scripts/                         init_db, seed, demo
-app/streamlit_app.py             demo UI
-tests/                           21 tests, no DB or AWS creds needed
-Dockerfile                       demo UI image (non-root, healthchecked)
+scripts/init_db.py               apply the schema
+scripts/seed.py                  embed and store historical incidents
+scripts/demo.py                  one full agent run, end to end
+scripts/eval.py                  recall quality benchmark
+data/incidents.json              8 seed incidents with root causes and lessons
+data/eval_alerts.json            10 eval alerts, 2 of them controls
+tests/                           30 tests, no DB or AWS creds needed
+app/streamlit_app.py             demo UI: run, search, replay, give feedback
+Dockerfile                       UI image (non-root, healthchecked)
 infra/template.yaml              SAM template for the Lambda
-infra/ecs-task-definition.json   Fargate task def for the UI
+infra/ecs-task-definition.json   Fargate task definition for the UI
 infra/deploy-ui.sh               build -> ECR -> ECS rollout
 .mcp.json                        CockroachDB managed MCP server, read-only
-mcp/                             MCP setup + the prompts we actually used
+mcp/README.md                    MCP setup + the prompts actually used
+docs/SETUP.md                    full setup walkthrough + troubleshooting
 docs/architecture.md             diagram and data flow
+docs/SUBMISSION.md               Devpost answers
+docs/VIDEO_SCRIPT.md             2:50 recording plan
 ```
 
 ## License

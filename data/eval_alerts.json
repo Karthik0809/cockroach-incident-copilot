@@ -1,0 +1,52 @@
+[
+  {
+    "alert": "orders-api p99 latency went from 200ms to 25s over 15 minutes. About a third of POST /orders are timing out at the gateway. Host CPU and memory flat. Database CPU normal. We shipped a retry wrapper nine days ago.",
+    "expect": "INC-1041",
+    "why": "Different service, same signature: latency climbing while CPU stays flat, after a retry change. The agent must generalize across services."
+  },
+  {
+    "alert": "Catalog service dashboard is entirely green but merchants say new products take hours to appear in the storefront. Consumer lag is zero.",
+    "expect": "INC-1077",
+    "why": "Green dashboard contradicting user-visible behavior -- a silent drop path, not a lag problem."
+  },
+  {
+    "alert": "Two customers report being billed twice for the same subscription renewal. Worker logs show the same renewal id handled by two pods within about 300ms.",
+    "expect": "INC-1103",
+    "why": "Read-then-write idempotency race. Must recall the unique-constraint fix, not suggest more caching."
+  },
+  {
+    "alert": "Finance says the monthly rollup is about 10% under what the source system reports. The nightly job exits zero every single night.",
+    "expect": "INC-1150",
+    "why": "Silent row loss with a success exit code."
+  },
+  {
+    "alert": "After we failed over to the secondary region, session validation in APAC went from 80ms to 1.6s. Error rate is still exactly zero. Traffic is unchanged.",
+    "expect": "INC-1188",
+    "why": "Zero errors plus multiplied latency after failover means cross-region routing, not database slowness."
+  },
+  {
+    "alert": "Users can attach small PDFs fine, but anything over ~10MB comes back 502. Nothing at all in the application logs for the failures.",
+    "expect": "INC-1204",
+    "why": "No app log line means the failure is upstream of the app -- an LB body limit."
+  },
+  {
+    "alert": "Landing page time-to-first-byte doubled right after the release. CPU is flat. Our config vendor is reporting degraded performance in one region.",
+    "expect": "INC-1231",
+    "why": "Blocking third-party call in the request path with no timeout."
+  },
+  {
+    "alert": "The weekly report job ran twice last Sunday, four minutes apart, after we drained a node for patching. Some accounts got duplicate emails.",
+    "expect": "INC-1276",
+    "why": "Schedulers are at-least-once; job needs its own lock."
+  },
+  {
+    "alert": "The office espresso machine is making a grinding noise and the milk frother stopped working.",
+    "expect": null,
+    "why": "Control case. Memory contains nothing relevant. The agent must return no match rather than stretch one."
+  },
+  {
+    "alert": "Kubernetes ingress controller pods are in CrashLoopBackOff after a cluster upgrade, with TLS handshake errors in the logs.",
+    "expect": null,
+    "why": "Plausible-sounding infra alert with no true precedent in memory. Tests that we do not manufacture a false match."
+  }
+]
