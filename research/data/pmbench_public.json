@@ -1,0 +1,1706 @@
+{
+ "source": "github.com/danluu/post-mortems (summaries not included)",
+ "generator": "qwen3:8b",
+ "items": [
+  {
+   "id": "PM-000",
+   "company": "Allegro",
+   "url": "https://allegro.tech/2018/08/postmortem-why-allegro-went-down.html",
+   "category": "Config Errors",
+   "alert": "The e-commerce platform is experiencing a complete outage. All user requests are timing out and the dashboard shows zero active service instances despite available hardware.",
+   "alert2": "The internal service for order processing is unresponsive. Metrics show no traffic is reaching the backend, but no instances are marked as unhealthy.",
+   "lesson": "Configuration errors in resource management can prevent scaling during traffic spikes. Ensure automated validation and monitoring of resource limits and scaling policies.",
+   "wrong_lesson": "The issue was due to insufficient hardware. Adding more servers would have resolved the problem."
+  },
+  {
+   "id": "PM-001",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/74876-2/",
+   "category": "Config Errors",
+   "alert": "The DNS service for internal applications is failing. Users are unable to resolve internal hostnames, and the dashboard shows a significant drop in healthy hosts.",
+   "alert2": "The internal DNS resolver is down. Metrics indicate a large number of failed DNS queries, but no recent deploy or configuration change is visible.",
+   "lesson": "Removing critical configuration settings without validation can lead to system instability. Implement semantic validation and automated rollback for configuration changes.",
+   "wrong_lesson": "The issue was due to a misconfigured DNS server. Rebooting the DNS service would have resolved the problem."
+  },
+  {
+   "id": "PM-002",
+   "company": "CircleCI",
+   "url": "https://discuss.circleci.com/t/incident-report-november-8-2021-jobs-stuck-in-a-not-running-state/41890",
+   "category": "Config Errors",
+   "alert": "The job distribution service is failing to process tasks. The dashboard shows schema validation errors and no new jobs are being assigned.",
+   "alert2": "The task distributor is not working. Metrics show no progress on job distribution, but no recent deploy or schema change is visible.",
+   "lesson": "Schema changes in databases should be carefully tested and rolled back if they cause compatibility issues. Consider using migration tools and versioned schemas.",
+   "wrong_lesson": "The issue was due to a bug in the distributor code. Fixing the code would have resolved the problem."
+  },
+  {
+   "id": "PM-003",
+   "company": "CircleCI",
+   "url": "https://discuss.circleci.com/t/post-incident-report-april-4-2025-circleci-ui-loading-build-triggering-issues/53208",
+   "category": "Config Errors",
+   "alert": "The API gateway is blocking legitimate traffic. Users are reporting errors, and the dashboard shows a spike in blocked requests with no corresponding deploy or configuration change.",
+   "alert2": "The web service is returning 403 errors for legitimate requests. Metrics show a large number of blocked requests, but no recent deploy or configuration change is visible.",
+   "lesson": "Changes to security policies should be made through approved infrastructure-as-code tools. Implement automated drift detection and audit trails for security configurations.",
+   "wrong_lesson": "The issue was due to a misconfigured firewall rule. Adjusting the firewall settings would have resolved the problem."
+  },
+  {
+   "id": "PM-004",
+   "company": "Cloudflare",
+   "url": "https://web.archive.org/web/20211006135542/https://blog.cloudflare.com/todays-outage-post-mortem-82515/",
+   "category": "Config Errors",
+   "alert": "All edge routers have crashed and are no longer processing traffic. The dashboard shows zero active connections and no incoming data.",
+   "alert2": "A critical service is offline across all regions. Metrics indicate a complete loss of connectivity at the edge layer.",
+   "lesson": "Misconfigured routing rules can cause widespread outages. Ensure all changes are validated in staging and monitored closely in production.",
+   "wrong_lesson": "A software bug in the router firmware caused the crash. Regular firmware updates should prevent this."
+  },
+  {
+   "id": "PM-005",
+   "company": "Cloudflare",
+   "url": "https://web.archive.org/web/20211016040522/https://blog.cloudflare.com/cloudflare-outage-on-july-17-2020/",
+   "category": "Config Errors",
+   "alert": "Traffic from North America and Europe is being routed to a single datacenter. The system is overwhelmed and unable to handle the load.",
+   "alert2": "A datacenter is receiving an abnormal amount of traffic, leading to service degradation. Multiple services are now unresponsive.",
+   "lesson": "Configuration errors during maintenance can lead to regional outages. Always verify routing changes with full redundancy in place.",
+   "wrong_lesson": "A network overload caused the datacenter to fail. Adding more bandwidth would have prevented this."
+  },
+  {
+   "id": "PM-006",
+   "company": "Cloudflare",
+   "url": "https://web.archive.org/web/20221112015610/https://blog.cloudflare.com/partial-cloudflare-outage-on-october-25-2022/",
+   "category": "Config Errors",
+   "alert": "A significant portion of user requests are returning a 530 error. The system is unable to process these requests within the expected timeframe.",
+   "alert2": "A large number of requests are failing with a non-standard status code. The error rate is higher than usual and not being caught in testing.",
+   "lesson": "Changes to complex systems can introduce subtle bugs that are hard to detect. Comprehensive testing and monitoring are essential.",
+   "wrong_lesson": "A missing dependency in the cache caused the errors. Ensuring all dependencies are included should prevent this."
+  },
+  {
+   "id": "PM-007",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/cloudflare-incident-on-january-24th-2023/",
+   "category": "Config Errors",
+   "alert": "Multiple services are experiencing unavailability. The dashboard shows a drop in service availability across several critical components.",
+   "alert2": "A key component of the platform is down, affecting multiple products. Metrics indicate a failure in the token management system.",
+   "lesson": "Errors in code release processes can disrupt multiple services. Implement strict validation and rollback procedures for critical systems.",
+   "wrong_lesson": "A hardware failure in the server cluster caused the outage. Regular hardware checks should have prevented this."
+  },
+  {
+   "id": "PM-008",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/1-1-1-1-lookup-failures-on-october-4th-2023/",
+   "category": "Config Errors",
+   "alert": "Users are reporting DNS resolution failures when attempting to access certain domains. The DNS query is returning SERVFAIL responses, and the service is not resolving as expected.",
+   "alert2": "Multiple internal services are experiencing intermittent DNS lookup failures. Some endpoints are timing out, and others are returning invalid DNS records.",
+   "lesson": "A software bug in the DNS resolution layer caused widespread SERVFAIL responses. Ensure all critical services have proper error handling and monitoring for unexpected DNS failures.",
+   "wrong_lesson": "A misconfigured firewall rule blocked DNS traffic. Ensure all DNS queries are allowed through the firewall and that no rules are blocking standard DNS ports."
+  },
+  {
+   "id": "PM-009",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/18-november-2025-outage/",
+   "category": "Config Errors",
+   "alert": "A critical system is showing unexpected behavior, with large files being generated and causing downstream failures. Multiple services are reporting errors related to file size limits.",
+   "alert2": "Several internal services are failing with errors about exceeding maximum file size limits. The system is unable to process the data correctly, leading to cascading failures.",
+   "lesson": "Improper permissions in a database caused an oversized file to be generated, leading to a systemwide outage. Always validate data size and limits before propagating changes across the network.",
+   "wrong_lesson": "A misconfigured logging system caused excessive log files. Ensure all logging is properly managed and that log files are rotated regularly."
+  },
+  {
+   "id": "PM-011",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/cloudflare-outage-february-20-2026/",
+   "category": "Config Errors",
+   "alert": "A cleanup task is causing unexpected removal of IP addresses. Multiple systems are reporting that their IP prefixes are being deleted without warning.",
+   "alert2": "Several services are experiencing IP address removals, and some are unable to communicate with external systems. The issue appears to be related to an automated cleanup process.",
+   "lesson": "A bug in an automated cleanup task caused incorrect querying of the Addressing API, leading to the deletion of all BYOIP prefixes. Always validate API interactions and ensure cleanup processes are tested in a staging environment.",
+   "wrong_lesson": "A misconfigured IP management tool was accidentally deleting IP addresses. Ensure all IP management tools are properly configured and that deletion processes are reviewed before execution."
+  },
+  {
+   "id": "PM-012",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/cloudflare-incident-on-february-6-2025/",
+   "category": "Config Errors",
+   "alert": "The R2 Gateway service is unreachable. All user requests are timing out. Dashboard metrics show zero active connections.",
+   "alert2": "The primary service for customer interactions is down. Internal monitoring shows no traffic reaching the backend. Users are reporting errors when accessing the platform.",
+   "lesson": "Insufficient validation in admin tools can lead to accidental service disruptions. Teams should implement confirmation prompts and double-check actions before applying changes.",
+   "wrong_lesson": "Lack of proper access controls allowed unauthorized users to disable the service. Ensure all admin tools are restricted to verified personnel."
+  },
+  {
+   "id": "PM-013",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/cloudflare-incident-march-21-2025/",
+   "category": "Config Errors",
+   "alert": "The main API gateway is failing to authenticate requests. Error logs show invalid credentials. Dashboard metrics show a spike in failed login attempts.",
+   "alert2": "The primary authentication service is rejecting all requests. Internal monitoring shows no traffic reaching the backend. Users are unable to log in.",
+   "lesson": "Deployment processes must include environment-specific flags to prevent accidental deployment to the wrong environment. Always verify deployment targets before executing.",
+   "wrong_lesson": "Old credentials were not properly rotated. Ensure all credentials are updated regularly and tested in a staging environment."
+  },
+  {
+   "id": "PM-015",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/cloudflare-incident-on-october-30-2023/",
+   "category": "Config Errors",
+   "alert": "Traffic is being routed to an unauthorized endpoint. Dashboard metrics show unexpected traffic patterns. Users are receiving HTTP 401 errors.",
+   "alert2": "The primary service is returning 401 errors for all requests. Internal monitoring shows traffic being directed to a non-existent endpoint. Some services are failing to respond.",
+   "lesson": "Deployment tools must ensure correct versioning and environment targeting. Always validate build versions and deployment targets before releasing to production.",
+   "wrong_lesson": "The build version was not properly tagged. Ensure all builds are clearly labeled and tested in staging before deployment."
+  },
+  {
+   "id": "PM-016",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/deep-dive-into-cloudflares-sept-12-dashboard-and-api-outage/",
+   "category": "Config Errors",
+   "alert": "The dashboard is unresponsive and showing error messages. Multiple API calls are failing with 503 errors. The system is experiencing high latency and degraded performance.",
+   "alert2": "The monitoring dashboard is displaying inconsistent data. Several backend services are returning 500 errors. Users are reporting slow load times and intermittent failures.",
+   "lesson": "Improperly configured dependency arrays in React components can lead to excessive API calls and system overload. Ensure dependency arrays are correctly defined and avoid unnecessary re-renders.",
+   "wrong_lesson": "The dashboard was overwhelmed by a surge in traffic. Implement rate limiting and increase server capacity to handle higher loads."
+  },
+  {
+   "id": "PM-017",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/route-leak-incident-january-22-2026/",
+   "category": "Config Errors",
+   "alert": "Multiple external peers are reporting unexpected routes. The routing system is showing invalid prefixes being advertised. Network latency is increasing across several regions.",
+   "alert2": "The routing table is displaying incorrect entries. External peers are receiving unexpected routes. Some services are experiencing connectivity issues and timeouts.",
+   "lesson": "Misconfigured routing policies can cause route leaks and disrupt external connectivity. Regularly audit and validate routing configurations, especially after automated changes.",
+   "wrong_lesson": "The network was flooded with traffic due to a DDoS attack. Implement firewall rules and traffic filtering to prevent unauthorized access."
+  },
+  {
+   "id": "PM-019",
+   "company": "Enom",
+   "url": "https://enomstatus.com/incidents/03q064h6rb7x",
+   "category": "Config Errors",
+   "alert": "The platform is experiencing downtime and users are unable to access their accounts. Website and email services are not functioning as expected. The maintenance window has been extended.",
+   "alert2": "Website accessibility is down and email delivery is failing. The migration process is taking longer than expected. Multiple issues are delaying the cutover.",
+   "lesson": "Complex migrations can lead to extended downtime and operational delays. Plan for contingencies, monitor progress closely, and communicate updates to stakeholders.",
+   "wrong_lesson": "The migration caused a network outage. Implement redundant network paths and ensure all services are properly configured before migration."
+  },
+  {
+   "id": "PM-020",
+   "company": "Firefox",
+   "url": "https://web.archive.org/web/20250314111052/https://hacks.mozilla.org/2022/02/retrospective-and-technical-details-on-the-recent-firefox-outage/",
+   "category": "Config Errors",
+   "alert": "Users report Firefox is unresponsive and unable to load web pages. Network metrics show high latency and dropped connections. Internal dashboards indicate HTTP/3 protocol errors are spiking.",
+   "alert2": "Multiple users are experiencing slow or failed page loads. Internal monitoring shows increased packet loss and timeouts on a different service. Some users are unable to access any websites through Firefox.",
+   "lesson": "Misconfigured or faulty protocol implementations can cause widespread network outages. Ensure all protocol changes are thoroughly tested in staging and monitored closely in production.",
+   "wrong_lesson": "A missing dependency in the HTTP/3 stack caused the issue. Ensure all required libraries are included in the build."
+  },
+  {
+   "id": "PM-021",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/the-library/dns-outage-post-mortem/",
+   "category": "Config Errors",
+   "alert": "DNS query timeouts are reported across multiple services. Internal metrics show a spike in DNS resolution failures. Some services are returning `NXDOMAIN` errors for valid queries.",
+   "alert2": "Several internal services are experiencing intermittent DNS failures. Monitoring shows increased latency and some services are returning incorrect DNS records.",
+   "lesson": "DNS configuration changes can have cascading effects on dependent systems. Validate DNS configurations and ensure dependencies are properly resolved before deployment.",
+   "wrong_lesson": "A misconfigured DNS server caused the issue. Ensure DNS servers are correctly configured and regularly monitored."
+  },
+  {
+   "id": "PM-023",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/company-news/github-availability-report-february-2026/",
+   "category": "Config Errors",
+   "alert": "Several internal services are failing to access critical VM metadata. Monitoring shows VM create and delete operations are timing out. Some services are returning 403 errors for VM-related requests.",
+   "alert2": "VM operations are failing across multiple regions. Internal metrics show increased failure rates for VM creation and deletion. Some services are unable to communicate with VMs.",
+   "lesson": "Security policies applied to compute resources can block essential operations. Ensure security policies are tested in isolation and do not interfere with critical system functions.",
+   "wrong_lesson": "A missing firewall rule caused the issue. Ensure all necessary firewall rules are in place and regularly reviewed."
+  },
+  {
+   "id": "PM-024",
+   "company": "GoCardless",
+   "url": "https://gocardless.com/blog/incident-review-api-and-dashboard-outage-on-10th-october/",
+   "category": "Config Errors",
+   "alert": "The database cluster is unreachable, and the API and Dashboard are down. Users are unable to access their data. Metrics show high latency and failed connection attempts.",
+   "alert2": "The primary service is experiencing intermittent connectivity issues. Dashboard widgets are not updating, and internal tools are timing out. Network probes are failing across multiple endpoints.",
+   "lesson": "Misconfigured systems can lead to cascading failures. Ensure all services are monitored for dependency health and have failover mechanisms in place.",
+   "wrong_lesson": "The database was not properly scaled. Ensure to scale databases before handling increased traffic."
+  },
+  {
+   "id": "PM-025",
+   "company": "Google",
+   "url": "https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident",
+   "category": "Config Errors",
+   "alert": "A critical service is showing unexpected termination after a set period. No user activity is being logged. System metrics indicate an automatic shutdown.",
+   "alert2": "A key component is being terminated without warning. Internal tools are reporting an end-of-term event. No manual intervention is being logged.",
+   "lesson": "Legacy provisioning options can lead to unintended contract terminations. Review all service lifecycle configurations and ensure they align with current operational needs.",
+   "wrong_lesson": "The service was not properly configured for long-term use. Ensure to use modern provisioning tools and avoid legacy options."
+  },
+  {
+   "id": "PM-027",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incident/cloud-networking/19009",
+   "category": "Config Errors",
+   "alert": "A large portion of the network is unreachable. Internal services are timing out, and external users are experiencing connectivity issues. Network latency is extremely high.",
+   "alert2": "Multiple regions are reporting network failures. Internal tools are unable to communicate with external systems. Latency is at an all-time high.",
+   "lesson": "Misconfigurations and software bugs can cause widespread network outages. Implement robust network monitoring and have failover strategies in place.",
+   "wrong_lesson": "The network was not properly configured for high traffic. Ensure to use modern network tools and avoid outdated configurations."
+  },
+  {
+   "id": "PM-028",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incidents/1xkAB1KmLrh5g3v9ZEZ7",
+   "category": "Config Errors",
+   "alert": "The load balancer for the user-facing API is showing high latency and intermittent connectivity. Dashboard metrics indicate a spike in dropped connections and increased error rates.",
+   "alert2": "A critical service for data processing is experiencing timeouts and partial data returns. Monitoring shows increased latency and a rise in failed requests.",
+   "lesson": "A latent bug in network configuration can be triggered by routine operations. Ensure all infrastructure changes are tested in staging environments and monitored for unexpected side effects.",
+   "wrong_lesson": "A misconfigured firewall rule caused the issue. Ensure all firewall rules are reviewed and tested before deployment."
+  },
+  {
+   "id": "PM-029",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incidents/6PM5mNd43NbMqjCZ5REh",
+   "category": "Config Errors",
+   "alert": "Users are reporting 404 errors on the main application portal. Internal dashboards show a significant increase in HTTP 404 responses and degraded service availability.",
+   "alert2": "A key backend service is returning empty responses and timeouts. Metrics indicate a drop in successful request rates and increased latency.",
+   "lesson": "Latent bugs in network configuration services can be triggered by routine operations. Implement thorough testing and monitoring for configuration changes.",
+   "wrong_lesson": "A misconfigured DNS record caused the issue. Ensure all DNS configurations are reviewed and validated before deployment."
+  },
+  {
+   "id": "PM-031",
+   "company": "Keepthescore",
+   "url": "https://web.archive.org/web/20201101133510/https://keepthescore.co/blog/posts/deleting_the_production_database/",
+   "category": "Config Errors",
+   "alert": "The production database is unreachable and returning connection errors. Dashboard metrics show a complete loss of connectivity to the database instance.",
+   "alert2": "The application is unable to access the database and is returning internal server errors. Monitoring indicates a complete loss of database connectivity.",
+   "lesson": "Accidental deletion of production databases can result in data loss. Implement strict access controls and enable real-time backups with frequent retention periods.",
+   "wrong_lesson": "A failed backup caused the issue. Ensure all backups are tested and validated regularly."
+  },
+  {
+   "id": "PM-032",
+   "company": "NPM",
+   "url": "https://blog.npmjs.org/post/74949623024/2014-01-28-outage-postmortem.html",
+   "category": "Config Errors",
+   "alert": "The service is experiencing unexpected routing to an outdated backend. Multiple endpoints are returning 502 errors. The dashboard shows a spike in failed requests and a drop in successful connections.",
+   "alert2": "A critical service is now unreachable. Metrics show a sudden increase in timeouts and a decrease in throughput. The system is routing traffic to an incorrect cluster.",
+   "lesson": "Misconfigured backend routing in a VCL file can cause unexpected traffic redirection. Always verify that restart actions do not reset critical configuration settings.",
+   "wrong_lesson": "A misconfigured load balancer caused the issue. Ensure that all backend servers are properly configured and tested before deployment."
+  },
+  {
+   "id": "PM-033",
+   "company": "OWASA",
+   "url": "https://web.archive.org/web/20210226170650/https://indyweek.com/news/archives/human-error-caused-owasa-fluoride-overdose-owasa-sorry/",
+   "category": "Config Errors",
+   "alert": "A critical system has been shut down due to an unexpected chemical imbalance. Operators report high fluoride levels in the water supply. Multiple sensors are showing abnormal readings.",
+   "alert2": "An emergency alert has been triggered. The water treatment system is offline. All water quality metrics are outside of acceptable thresholds.",
+   "lesson": "Manual button presses without proper confirmation can lead to critical system failures. Implement safeguards and confirmation steps for high-impact actions.",
+   "wrong_lesson": "A software bug caused the system to shut down. Ensure all automated processes are thoroughly tested and monitored."
+  },
+  {
+   "id": "PM-035",
+   "company": "Razorpay",
+   "url": "https://web.archive.org/web/20250207075402/https://razorpay.com/blog/day-of-rds-multi-az-failover/",
+   "category": "Config Errors",
+   "alert": "A critical database service is down and returning errors. Multiple queries are timing out. The system is showing signs of data inconsistency and unavailability.",
+   "alert2": "The database is experiencing severe performance degradation. Metrics show high latency and a drop in query success rates. Data integrity is at risk.",
+   "lesson": "Incorrect MySQL configuration can lead to data loss during hardware failures. Ensure that replication, backups, and failover settings are properly configured and tested.",
+   "wrong_lesson": "A disk failure caused the data loss. Ensure that all storage systems are monitored and replaced before they fail."
+  },
+  {
+   "id": "PM-036",
+   "company": "rust-lang",
+   "url": "https://blog.rust-lang.org/inside-rust/2023/02/08/dns-outage-portmortem.html",
+   "category": "Config Errors",
+   "alert": "The static content service is unreachable. Users are reporting errors when accessing static assets. The dashboard shows a 100% error rate for the static endpoint.",
+   "alert2": "The media delivery service is experiencing high latency. Metrics show a spike in failed requests and increased timeout rates. Users are unable to load critical assets.",
+   "lesson": "Ensure DNS and certificate updates are performed in parallel to avoid downtime. Verify that all dependent services are updated simultaneously during deployments.",
+   "wrong_lesson": "The issue was caused by a misconfigured DNS provider. Ensure that DNS records are manually verified before deployment."
+  },
+  {
+   "id": "PM-037",
+   "company": "rust-lang",
+   "url": "https://blog.rust-lang.org/inside-rust/2023/07/21/crates-io-postmortem.html",
+   "category": "Config Errors",
+   "alert": "The download service is returning 500 errors. Users are unable to fetch packages. The system is showing a high number of failed requests.",
+   "alert2": "The package distribution service is experiencing a surge in failed requests. Metrics indicate a large number of retries and timeouts. Users are unable to complete downloads.",
+   "lesson": "Validate URL generation logic during deployments. Ensure that all endpoints are tested with real-world traffic before rolling out changes.",
+   "wrong_lesson": "The issue was caused by a missing dependency. Ensure all required libraries are included in the deployment."
+  },
+  {
+   "id": "PM-039",
+   "company": "TUI",
+   "url": "https://assets.publishing.service.gov.uk/media/604f423be90e077fdf88493f/Boeing_737-8K5_G-TAWG_04-21.pdf",
+   "category": "Config Errors",
+   "alert": "The passenger weight calculation system is returning incorrect values. The load sheet shows a significant discrepancy in total weight. Multiple passengers are being misclassified.",
+   "alert2": "The reservation system is producing inaccurate weight data. Metrics show a large number of passengers with incorrect weight classifications. The load sheet is inconsistent with actual passenger data.",
+   "lesson": "Validate data transformations during system upgrades. Ensure that all logic related to passenger classification is thoroughly tested and verified.",
+   "wrong_lesson": "The issue was caused by a software bug in the reservation system. Ensure that all system upgrades are tested in a staging environment before deployment."
+  },
+  {
+   "id": "PM-040",
+   "company": "Turso",
+   "url": "https://blog.turso.tech/incident-2023-12-04-data-leak-and-loss-in-some-free-tier-databases-7cba5bc7",
+   "category": "Config Errors",
+   "alert": "A critical service is showing unexpected data inconsistencies. Multiple user accounts are reporting missing or duplicated data. The dashboard indicates a spike in failed read operations.",
+   "alert2": "A secondary service is experiencing intermittent data corruption. Users are seeing invalid results from recent queries. The system logs show a high rate of unexplained data mismatches.",
+   "lesson": "Misconfigured backup identifiers can lead to data leaks and unintended data loss. Ensure all backup systems use unique, properly scoped identifiers to prevent data overlap.",
+   "wrong_lesson": "Backup systems should be regularly tested for data integrity. The issue was caused by a lack of testing, not misconfiguration."
+  },
+  {
+   "id": "PM-041",
+   "company": "Valve",
+   "url": "https://blog.thousandeyes.com/steam-outage-monitor-data-center-connectivity/",
+   "category": "Config Errors",
+   "alert": "A major service is experiencing widespread connectivity issues. Users are unable to access core features. Network monitoring shows a significant drop in traffic to key regions.",
+   "alert2": "A critical service is showing signs of network instability. Multiple regions are reporting intermittent outages. The routing tables indicate unexpected traffic rerouting.",
+   "lesson": "Incorrect BGP configurations can cause large-scale network outages. Regularly review and validate routing policies to prevent unintended traffic redirection.",
+   "wrong_lesson": "Network outages were caused by a third-party provider failure. The solution was to switch to a more reliable provider."
+  },
+  {
+   "id": "PM-043",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/67457/",
+   "category": "Hardware/Power Failures",
+   "alert": "A critical service is experiencing power instability. Multiple systems are reporting intermittent outages. The monitoring dashboard shows a sudden drop in availability.",
+   "alert2": "A secondary service is showing signs of power fluctuations. Systems are failing to maintain consistent operation. The logs indicate repeated power interruptions.",
+   "lesson": "Backup generators must be tested under realistic load conditions to ensure they can handle actual workloads. Load tests should simulate real-world scenarios.",
+   "wrong_lesson": "The issue was caused by a lack of maintenance on the generators. Regular maintenance should be scheduled to prevent failures."
+  },
+  {
+   "id": "PM-044",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/4372T8/",
+   "category": "Hardware/Power Failures",
+   "alert": "A critical service in the Sydney region is experiencing intermittent outages. Multiple instances are unreachable and dashboard metrics show high latency and failed health checks.",
+   "alert2": "A secondary service in the same region is showing degraded performance. Users are reporting timeouts, and internal monitoring shows increased error rates and partial service unavailability.",
+   "lesson": "Power loss in a data center can lead to cascading failures in redundant systems. Ensure that backup power systems are tested and that failover mechanisms are robust and independent of primary power sources.",
+   "wrong_lesson": "The issue was caused by a software bug in the power management system. Regularly updating and patching control systems can prevent such failures."
+  },
+  {
+   "id": "PM-045",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/656481/",
+   "category": "Hardware/Power Failures",
+   "alert": "A key service in S\u00e3o Paulo is experiencing partial outages. Metrics show a spike in failed requests and some endpoints are unreachable. Network latency is also elevated.",
+   "alert2": "A secondary service in the same region is showing signs of instability. Users are reporting connectivity issues, and internal monitoring shows increased packet loss and routing anomalies.",
+   "lesson": "Multiple points of failure in power and network systems can compound during an outage. Ensure that backup generators are tested and that network configurations are resilient to configuration drift.",
+   "wrong_lesson": "The problem was due to a misconfigured firewall rule. Regularly reviewing and testing network configurations can prevent such issues."
+  },
+  {
+   "id": "PM-047",
+   "company": "ARPANET",
+   "url": "https://datatracker.ietf.org/doc/html/rfc789.html",
+   "category": "Hardware/Power Failures",
+   "alert": "A core network service is experiencing widespread connectivity issues. Users are reporting packet loss and some endpoints are unreachable. Internal metrics show abnormal routing behavior.",
+   "alert2": "A secondary service is showing signs of network instability. Users are reporting timeouts, and internal monitoring shows increased latency and routing anomalies.",
+   "lesson": "Faulty routing data can propagate through the network, causing widespread outages. Ensure that routing systems are monitored for anomalies and that failover mechanisms are robust.",
+   "wrong_lesson": "The issue was caused by a misconfigured routing protocol. Regularly reviewing and testing routing configurations can prevent such issues."
+  },
+  {
+   "id": "PM-048",
+   "company": "Cloudflare",
+   "url": "https://web.archive.org/web/20211015231917/https://blog.cloudflare.com/a-byzantine-failure-in-the-real-world/",
+   "category": "Hardware/Power Failures",
+   "alert": "The API is returning 503 errors for all endpoints. The dashboard is completely unresponsive and shows no data. Users are unable to access critical features.",
+   "alert2": "The monitoring dashboard is showing a 100% error rate for the service. Multiple endpoints are timing out. Internal tools are not functioning as expected.",
+   "lesson": "A partial switch misbehavior can lead to cascading failures. Ensure redundancy and proper monitoring of network components to detect and isolate issues quickly.",
+   "wrong_lesson": "A configuration error in the load balancer caused the outage. Ensure all load balancer settings are reviewed and tested regularly."
+  },
+  {
+   "id": "PM-049",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/major-data-center-power-failure-again-cloudflare-code-orange-tested/",
+   "category": "Hardware/Power Failures",
+   "alert": "The data center's power systems are offline. All servers are unresponsive. Critical services are down and no backup power is available.",
+   "alert2": "The power monitoring system is not reporting any status. All servers are in a halted state. No redundancy is being detected in the power supply.",
+   "lesson": "Incorrect breaker coordination settings can bypass redundant power paths. Regularly review and test power infrastructure configurations to prevent single points of failure.",
+   "wrong_lesson": "A hardware failure in the power supply caused the outage. Ensure all power supplies are redundant and tested regularly."
+  },
+  {
+   "id": "PM-050",
+   "company": "FirstEnergy / General Electric",
+   "url": "https://en.wikipedia.org/wiki/Northeast_blackout_of_2003",
+   "category": "Hardware/Power Failures",
+   "alert": "The power distribution system is not triggering alarms for the affected lines. Operators are unable to respond to the issue. Multiple regions are experiencing outages.",
+   "alert2": "The monitoring system is not detecting any alerts for the transmission lines. Power is being rerouted, but the system is not logging any events.",
+   "lesson": "A bug in the monitoring system can prevent alarms from triggering, leading to cascading failures. Ensure monitoring systems are reliable and tested for edge cases.",
+   "wrong_lesson": "A lack of automated response systems caused the outage. Implement fully automated power redistribution systems to prevent manual delays."
+  },
+  {
+   "id": "PM-052",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incidents/fmEL9i2fArADKawkZAa2",
+   "category": "Hardware/Power Failures",
+   "alert": "Multiple services in the europe-west2-a region are showing high latency and partial unavailability. Users are reporting intermittent access issues to several hosted applications.",
+   "alert2": "A number of services under the europe-west2 region are experiencing degraded performance. Some users are unable to access their applications, and internal dashboards show increased error rates.",
+   "lesson": "Ensure redundancy and failover mechanisms are tested and validated. Regularly review infrastructure health and monitor for signs of systemic failures.",
+   "wrong_lesson": "Ensure all cooling systems are regularly maintained. Schedule routine inspections to prevent hardware failures."
+  },
+  {
+   "id": "PM-053",
+   "company": "PythonAnywhere",
+   "url": "https://blog.pythonanywhere.com/189/",
+   "category": "Hardware/Power Failures",
+   "alert": "A critical storage volume has failed, causing multiple hosted services to become inaccessible. Users are reporting errors when trying to access their websites and applications.",
+   "alert2": "Several services are experiencing data loss and unavailability. Internal metrics show a significant drop in read/write operations for affected systems.",
+   "lesson": "Implement robust data redundancy and failover strategies. Regularly test backup and recovery procedures to ensure data integrity.",
+   "wrong_lesson": "Ensure all storage volumes are properly configured. Schedule regular maintenance to prevent unexpected failures."
+  },
+  {
+   "id": "PM-054",
+   "company": "Sun",
+   "url": "https://www.forbes.com/forbes/2000/1113/6613068a.html#6d1bdc036162",
+   "category": "Hardware/Power Failures",
+   "alert": "A number of systems are experiencing data corruption and unexpected crashes. Users are reporting errors and inconsistent behavior in their applications.",
+   "alert2": "Several services are showing signs of data inconsistency and system instability. Internal logs indicate potential memory corruption issues.",
+   "lesson": "Use hardware that supports ECC memory to prevent data corruption. Establish clear communication channels for reporting and resolving critical issues.",
+   "wrong_lesson": "Ensure all memory modules are properly seated. Schedule regular hardware checks to prevent memory-related failures."
+  },
+  {
+   "id": "PM-055",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/101925/",
+   "category": "Conflicts",
+   "alert": "The regional endpoint for DynamoDB is returning empty records, causing application errors. Users are unable to access their data and services are failing unexpectedly.",
+   "alert2": "A critical DNS endpoint is not resolving correctly, leading to service outages. Internal metrics show a spike in failed health checks and connection errors.",
+   "lesson": "Implement proper synchronization mechanisms for distributed systems. Regularly test and validate DNS and endpoint configurations to prevent race conditions.",
+   "wrong_lesson": "Ensure all DNS processes are running correctly. Schedule regular DNS health checks to prevent configuration errors."
+  },
+  {
+   "id": "PM-056",
+   "company": "CCP Games",
+   "url": "https://community.eveonline.com/news/dev-blogs/about-the-boot.ini-issue/",
+   "category": "Conflicts",
+   "alert": "The system is experiencing unexpected boot failures. The boot process is not completing successfully. The dashboard shows a critical error during startup.",
+   "alert2": "A critical service is down and not responding to health checks. The system is unable to load the required configuration files. Metrics show a high number of failed startup attempts.",
+   "lesson": "Ensure that configuration files are not accidentally overwritten during installation. Verify file integrity and permissions before deploying updates.",
+   "wrong_lesson": "The issue was caused by a corrupted installation package. Reinstalling the package resolved the problem."
+  },
+  {
+   "id": "PM-057",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/the-library/downtime-last-saturday/",
+   "category": "Conflicts",
+   "alert": "Network latency has spiked and is causing service disruptions. Multiple nodes are reporting connectivity issues. The dashboard shows a significant increase in packet loss.",
+   "alert2": "A critical service is experiencing intermittent connectivity. The system is unable to maintain stable communication between nodes. Metrics show a high number of failed heartbeats.",
+   "lesson": "Ensure that network upgrades are performed with proper coordination to avoid disrupting failover mechanisms. Validate link states and peer relationships before initiating any changes.",
+   "wrong_lesson": "The issue was caused by a misconfigured switch. Rebooting the switch resolved the problem."
+  },
+  {
+   "id": "PM-059",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/company-news/github-availability-report-october-2020/",
+   "category": "Conflicts",
+   "alert": "A critical service is experiencing unexpected downtime. The system is unable to process requests. Metrics show a high number of failed connections.",
+   "alert2": "A service is reporting inconsistent behavior. The system is unable to maintain a stable connection to the cluster. Metrics show a high number of failed leader elections.",
+   "lesson": "Ensure that new nodes are added gradually to avoid cluster splits. Validate cluster membership and leader election processes during maintenance.",
+   "wrong_lesson": "The issue was caused by a misconfigured broker. Restarting the broker resolved the problem."
+  },
+  {
+   "id": "PM-060",
+   "company": "GoCardless",
+   "url": "https://gocardless.com/blog/zero-downtime-postgres-migrations-the-hard-parts/",
+   "category": "Conflicts",
+   "alert": "The critical service's query latency has spiked to over 10 seconds, and the dashboard shows a significant drop in successful requests. The database connection pool is reporting high wait times and timeouts.",
+   "alert2": "A key API endpoint is returning 503 errors with a timeout message, and the service's health check is failing. The database metrics show a large number of blocked queries and long-running transactions.",
+   "lesson": "Ensure that database migrations are coordinated with query patterns to avoid blocking critical operations. Monitor for long-running queries during schema changes and implement circuit breakers or retries where appropriate.",
+   "wrong_lesson": "Slow migration scripts caused the issue, so optimizing the migration process will prevent future outages. Ensure all migrations are run during off-peak hours."
+  },
+  {
+   "id": "PM-061",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incident/compute/17003#5660850647990272",
+   "category": "Conflicts",
+   "alert": "The public-facing service is experiencing a delay in processing configuration updates. The dashboard shows a backlog in the deployment pipeline and no progress on recent changes.",
+   "alert2": "A critical configuration change is not appearing in the live environment, and the deployment logs show a long delay in applying the update. The service is returning 500 errors for certain endpoints.",
+   "lesson": "Avoid using slow code paths for critical configuration changes. Implement a separate, faster mechanism for handling urgent updates to infrastructure components.",
+   "wrong_lesson": "The slow code path was the issue, so we should replace it with a faster one. This will ensure that all changes are applied quickly and without delay."
+  },
+  {
+   "id": "PM-062",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incidents/eo76pxZiDgWVz4z3kmUv",
+   "category": "Conflicts",
+   "alert": "Network latency has increased significantly, and some endpoints are timing out. The dashboard shows a drop in throughput and an increase in packet loss between key locations.",
+   "alert2": "A major portion of the network traffic is being rerouted, and some services are experiencing intermittent connectivity. The network monitoring tool shows a reduction in available bandwidth and increased latency.",
+   "lesson": "Monitor network paths and bandwidth usage during infrastructure changes. Have contingency plans in place to reroute traffic and maintain service availability during outages.",
+   "wrong_lesson": "The fiber path failure was the root cause, so we should replace the fiber cables. This will prevent future outages and ensure stable network performance."
+  },
+  {
+   "id": "PM-063",
+   "company": "incident.io",
+   "url": "https://incident.io/blog/one-two-skip-a-few",
+   "category": "Conflicts",
+   "alert": "The system is showing gaps in the sequence numbers for incident IDs, with some IDs skipping over several values. The dashboard indicates a jump in the next available ID.",
+   "alert2": "A number of incident IDs are missing from the logs, and the system is generating duplicate IDs. The sequence generator is not functioning as expected.",
+   "lesson": "Avoid relying on sequence generators for critical identifiers. Use deterministic methods like triggers or custom logic to ensure continuity and avoid gaps.",
+   "wrong_lesson": "The sequence generator was misconfigured, so we should fix the configuration to ensure it works correctly. This will prevent gaps in the ID sequence."
+  },
+  {
+   "id": "PM-064",
+   "company": "Knight Capital",
+   "url": "https://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale/",
+   "category": "Conflicts",
+   "alert": "A critical service is experiencing unexplained latency and partial data loss. Users are reporting missing transactions in their accounts.",
+   "alert2": "A key API endpoint is returning inconsistent results. Dashboard metrics show a spike in error rates and a drop in throughput.",
+   "lesson": "Inconsistent deployment versions and reusing legacy code can lead to severe financial and operational impacts. Ensure strict version control and code isolation.",
+   "wrong_lesson": "The issue was caused by a misconfigured deployment pipeline. Fixing the pipeline should prevent future issues."
+  },
+  {
+   "id": "PM-065",
+   "company": "WebKit code repository",
+   "url": "https://web.archive.org/web/20210306015541/https://digital.ai/catalyst-blog/subversion-sha1-collision-problem-statement-prevention-and-remediation-options",
+   "category": "Conflicts",
+   "alert": "A core data store is showing unexpected file corruption. Users are unable to access certain data due to consistency checks failing.",
+   "alert2": "A critical service is experiencing intermittent data retrieval failures. Metrics show a high number of failed consistency checks.",
+   "lesson": "Using hash collisions in data storage can lead to unexpected failures. Always validate uniqueness and use multiple hashing algorithms.",
+   "wrong_lesson": "The problem was due to a bug in the file storage system. Updating the system should resolve the issue."
+  },
+  {
+   "id": "PM-066",
+   "company": "Azure",
+   "url": "https://azure.microsoft.com/en-us/blog/summary-of-windows-azure-service-disruption-on-feb-29th-2012/",
+   "category": "Time",
+   "alert": "A major service is experiencing certificate validation errors. Users are being blocked from accessing the platform.",
+   "alert2": "A key authentication service is returning invalid certificate errors. Metrics show a high rate of failed validation attempts.",
+   "lesson": "Using naive date calculations for certificate expiration can lead to invalid dates. Use well-tested libraries for date arithmetic.",
+   "wrong_lesson": "The issue was caused by a bug in the certificate generation tool. Reinstalling the tool should fix the problem."
+  },
+  {
+   "id": "PM-067",
+   "company": "Cloudflare",
+   "url": "https://web.archive.org/web/20211104160742/https://blog.cloudflare.com/how-and-why-the-leap-second-affected-cloudflare-dns/",
+   "category": "Time",
+   "alert": "A critical service is experiencing random failures during DNS lookups. Users are seeing intermittent connectivity issues.",
+   "alert2": "A key API is returning inconsistent results. Metrics show a high number of failed DNS resolution attempts.",
+   "lesson": "Assuming system time is monotonic can lead to unexpected behavior in random number generators. Validate time behavior in critical systems.",
+   "wrong_lesson": "The issue was caused by a bug in the DNS resolver. Updating the resolver should resolve the problem."
+  },
+  {
+   "id": "PM-068",
+   "company": "Linux",
+   "url": "https://web.archive.org/web/20220427012208/https://lkml.org/lkml/2009/1/2/373",
+   "category": "Time",
+   "alert": "The dashboard shows a spike in system latency and a critical alert about a potential deadlock in the time synchronization service. Multiple services are reporting timeouts and unresponsive endpoints.",
+   "alert2": "A secondary alert indicates that the time synchronization service is experiencing unexpected delays, with some services showing inconsistent timestamps and others failing to process requests within expected timeframes.",
+   "lesson": "A deadlock can occur when a time-related operation acquires a lock that is also required by a logging function. Ensure that critical time-handling code does not hold locks that could be needed by other system components.",
+   "wrong_lesson": "The issue was caused by a bug in the logging function, which should have been fixed by disabling printk during time updates."
+  },
+  {
+   "id": "PM-069",
+   "company": "Linux",
+   "url": "https://web.archive.org/web/20220320100036/https://lkml.org/lkml/2012/7/1/203",
+   "category": "Time",
+   "alert": "The system monitoring tool reports that several services are experiencing unexpected timing discrepancies, with some processes running ahead of schedule and others falling behind. A large number of services are showing high CPU usage and unresponsive behavior.",
+   "alert2": "A second alert indicates that the time synchronization service is failing to update correctly, leading to inconsistent timing across multiple systems and causing widespread service disruptions.",
+   "lesson": "Incorrect handling of leap seconds can lead to timing anomalies that affect timer-based operations. Ensure that time updates are synchronized with the system's timer mechanisms to avoid unexpected behavior.",
+   "wrong_lesson": "The problem was caused by a misconfiguration in the time synchronization service, which was fixed by reconfiguring the system clock."
+  },
+  {
+   "id": "PM-070",
+   "company": "Mozilla",
+   "url": "https://web.archive.org/web/20250303152906/https://hacks.mozilla.org/2019/07/add-ons-outage-post-mortem-result/",
+   "category": "Time",
+   "alert": "The certificate validation service is reporting a large number of failed connections and certificate errors. Multiple services are showing connection timeouts and authentication failures.",
+   "alert2": "A second alert indicates that the certificate validation service is experiencing a high volume of failed requests, with some services reporting certificate chain issues and others failing to establish secure connections.",
+   "lesson": "Certificate expiration can cause widespread service outages, especially when a fallback solution is not properly tested or implemented. Ensure that certificate chains are validated and that fallback mechanisms are thoroughly tested.",
+   "wrong_lesson": "The issue was caused by a certificate misconfiguration, which was fixed by updating the certificate store and revalidating all connections."
+  },
+  {
+   "id": "PM-071",
+   "company": "CircleCI",
+   "url": "https://status.circleci.com/incidents/8rklh3qqckp1",
+   "category": "Database",
+   "alert": "The build system is reporting a massive backlog of queued operations, with many builds stuck in the processing stage. Several services are showing unresponsive endpoints and high queue depths.",
+   "alert2": "A second alert indicates that the build scheduler is failing to process new builds, with some services reporting timeouts and others showing unexpected delays in processing.",
+   "lesson": "A saturated queue can lead to system unresponsiveness and failure to handle new requests. Ensure that the system has sufficient capacity to handle peak loads and that failover mechanisms are designed to avoid further degradation.",
+   "wrong_lesson": "The issue was caused by a bug in the build scheduler, which was fixed by increasing the number of worker nodes and optimizing the queue processing logic."
+  },
+  {
+   "id": "PM-072",
+   "company": "CircleCI",
+   "url": "https://discuss.circleci.com/t/post-incident-report-april-4-2025-delays-in-starting-workflows/53113",
+   "category": "Database",
+   "alert": "The workflows service is experiencing high latency and job drop rates. Metrics show increased query times and failed retries across multiple endpoints.",
+   "alert2": "The task scheduler is showing a spike in failed tasks and increased response times. Dashboard indicators suggest database performance degradation.",
+   "lesson": "Outdated database statistics can lead to poor query planning and performance degradation. Ensure statistics are updated after schema changes and upgrades.",
+   "wrong_lesson": "Insufficient disk I/O caused the performance issues. Increasing disk throughput and optimizing query patterns resolved the problem."
+  },
+  {
+   "id": "PM-073",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/the-library/github-availability-this-week/",
+   "category": "Database",
+   "alert": "The replication manager has failed over the primary database to a secondary node. The secondary node is showing a cold buffer pool and replication lag.",
+   "alert2": "The database cluster is experiencing unexpected master elections and data drift. Some repositories are being assigned to the wrong owners.",
+   "lesson": "Stale nodes can cause data drift and replication issues. Ensure failover processes are tested and nodes are properly maintained.",
+   "wrong_lesson": "The replication manager had a bug that caused the failover. Updating the replication manager resolved the issue."
+  },
+  {
+   "id": "PM-075",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/company-news/github-availability-report-may-2021/",
+   "category": "Database",
+   "alert": "Scoped token operations are failing with high error rates. Actions and Pages are experiencing unauthorized access issues.",
+   "alert2": "The database is showing a foreign key constraint violation. Git operations are failing and some access grants are incorrect.",
+   "lesson": "Integer overflow in database columns can cause critical failures. Use appropriate data types and implement robust schema validation.",
+   "wrong_lesson": "The database was not properly indexed, leading to slow query performance. Adding indexes resolved the issue."
+  },
+  {
+   "id": "PM-076",
+   "company": "GitHub",
+   "url": "https://github.blog/2022-03-23-an-update-on-recent-service-disruptions/",
+   "category": "Database",
+   "alert": "The `user-service` dashboard shows a spike in failed connection attempts to the database. Multiple services are reporting timeouts when accessing the primary database node. The system is experiencing high latency for read operations.",
+   "alert2": "The `auth-backend` service is encountering connection errors to the database cluster. Several endpoints are timing out, and the dashboard indicates a high number of failed connections. The system is struggling to handle read requests.",
+   "lesson": "Shared database clusters can become overwhelmed during peak load, leading to connection exhaustion and failovers. Ensure proper connection pooling, monitoring, and capacity planning for shared resources.",
+   "wrong_lesson": "The database cluster was misconfigured with too many connections allowed. The fix was to reduce the maximum connection limit and add more replicas."
+  },
+  {
+   "id": "PM-077",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/company-news/addressing-githubs-recent-availability-issues/",
+   "category": "Database",
+   "alert": "The `pull-request-service` is reporting a high number of connection errors to the database. The dashboard shows a spike in failed writes and increased latency for token issuance. Multiple services are experiencing timeouts.",
+   "alert2": "The `auth-service` is encountering connection failures to the database cluster. The system is struggling to handle write operations, and the dashboard shows a high number of failed connections. Several endpoints are timing out.",
+   "lesson": "Configuration rollouts can cause unintended connection saturation, leading to failovers and degraded service. Always test changes in staging and monitor for unexpected load impacts.",
+   "wrong_lesson": "The database was not properly scaled, leading to connection saturation. The fix was to add more database nodes and increase the connection limit."
+  },
+  {
+   "id": "PM-079",
+   "company": "GitHub",
+   "url": "https://github.blog/2021-12-01-github-availability-report-november-2021/",
+   "category": "Database",
+   "alert": "The `read-replica-service` is reporting a high number of connection errors and timeouts. The dashboard shows a spike in failed read operations and increased latency for query responses. Multiple services are experiencing degraded performance.",
+   "alert2": "The `analytics-service` is encountering connection failures to the database cluster. The system is struggling to handle read requests, and the dashboard shows a high number of failed connections. Several endpoints are timing out.",
+   "lesson": "Schema migrations on large tables can cause deadlocks and resource contention, leading to read replica failures. Ensure proper migration planning, including testing and monitoring for deadlocks.",
+   "wrong_lesson": "The database was not properly configured for read replicas, leading to deadlocks. The fix was to increase the number of read replicas and optimize the schema migration process."
+  },
+  {
+   "id": "PM-080",
+   "company": "Heroku",
+   "url": "https://status.heroku.com/incidents/2558",
+   "category": "Database",
+   "alert": "The authorization creation process is failing with a database error. Users are unable to create new deployments. The Heroku API is experiencing a full outage.",
+   "alert2": "A critical service is down, preventing deployment creation. Metrics show a spike in database connection errors. The dashboard is reporting a complete API failure.",
+   "lesson": "Ensure data types in foreign keys are compatible with referenced primary keys. Monitor for overflow errors and validate schema consistency across services.",
+   "wrong_lesson": "The issue was caused by a misconfigured database connection pool. Increasing the pool size resolved the problem."
+  },
+  {
+   "id": "PM-081",
+   "company": "incident.io",
+   "url": "https://incident.io/blog/database-performance",
+   "category": "Database",
+   "alert": "Application timeouts are occurring during user interactions. Database connection pool is showing high contention. Some endpoints are unresponsive.",
+   "alert2": "A critical service is experiencing delays. Metrics indicate connection pool exhaustion. Users are reporting slow response times for form submissions.",
+   "lesson": "Avoid wrapping unnecessary transactions around frequent operations. Monitor connection pool usage and optimize transactional patterns.",
+   "wrong_lesson": "The issue was caused by a slow query. Optimizing the query and adding indexes resolved the problem."
+  },
+  {
+   "id": "PM-082",
+   "company": "incident.io",
+   "url": "https://status.incident.io/incidents/01JRDFKAGE07YYDY0KZR137BX3/write-up",
+   "category": "Database",
+   "alert": "The database is unresponsive and blocking all operations. Users are unable to access the dashboard or mobile app. The API is down.",
+   "alert2": "A critical database service is down. Metrics show high lock contention and no progress on queries. Internal tools are reporting a full outage.",
+   "lesson": "Avoid enabling extensions like PGAudit during migrations. Test interactions between new features and existing database configurations.",
+   "wrong_lesson": "The issue was caused by a failed migration. Rolling back the migration fixed the problem."
+  },
+  {
+   "id": "PM-083",
+   "company": "Allegro",
+   "url": "https://allegro.tech/2015/01/allegro-cast-post-mortem.html",
+   "category": "Uncategorized",
+   "alert": "A critical subsystem is down, affecting multiple features. Users cannot complete purchases or edit offers. The newsletter is not being sent.",
+   "alert2": "A distributed task processing system is failing. Internal tools are reporting partial outages. Some admin panels are not functioning.",
+   "lesson": "Ensure distributed task systems are resilient to failures. Monitor for bottlenecks in asynchronous processing pipelines.",
+   "wrong_lesson": "The issue was caused by a failed deployment. Rolling back the deployment fixed the problem."
+  },
+  {
+   "id": "PM-084",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/41926/",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing widespread outages in the US-EAST-1 region. Multiple dependent systems are failing to operate correctly after a recent update.",
+   "alert2": "A key component of the system is down, causing cascading failures across multiple services. Metrics show high latency and partial unavailability in several zones.",
+   "lesson": "Human error during routine operations can lead to cascading failures. Ensure all commands are verified and have safeguards against unintended scale.",
+   "wrong_lesson": "A misconfigured auto-scaling group caused the outage. Ensure scaling policies are reviewed and tested regularly."
+  },
+  {
+   "id": "PM-085",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/65648/",
+   "category": "Uncategorized",
+   "alert": "A major outage is affecting all US East Availability Zones. Users are reporting significant latency and partial service unavailability.",
+   "alert2": "A critical service is down, and there is a noticeable drop in performance across multiple regions. Some endpoints are unreachable.",
+   "lesson": "Human error during routine maintenance can be compounded by software bugs. Implement thorough testing and rollback procedures for upgrades.",
+   "wrong_lesson": "A network configuration change caused the outage. Ensure all changes are reviewed and tested in staging environments."
+  },
+  {
+   "id": "PM-087",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/680587/",
+   "category": "Uncategorized",
+   "alert": "The Elastic Load Balancer is experiencing unexpected downtime. Multiple endpoints are returning errors and timeouts.",
+   "alert2": "A critical load balancing service is down, causing traffic to be routed incorrectly. Some services are unreachable.",
+   "lesson": "Maintenance processes on critical infrastructure must be carefully controlled to avoid unintended disruptions. Implement validation checks before executing changes.",
+   "wrong_lesson": "A misconfigured health check caused the outage. Ensure all health checks are properly configured and tested."
+  },
+  {
+   "id": "PM-088",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/5467D2/",
+   "category": "Uncategorized",
+   "alert": "Metadata service latency has spiked above acceptable thresholds, causing storage nodes to begin disconnecting. Multiple storage nodes are now in an active retry loop, increasing load on the metadata service.",
+   "alert2": "A critical service is experiencing high latency and connection failures. Nodes are repeatedly attempting to reconnect, which is causing further strain on the backend infrastructure.",
+   "lesson": "A cascading failure occurred due to a timeout-based self-protection mechanism. Ensure that timeout thresholds are appropriately tuned and that retry logic is designed to avoid amplifying load.",
+   "wrong_lesson": "The issue was caused by an overloaded metadata service. The fix was to scale the service horizontally."
+  },
+  {
+   "id": "PM-089",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/11201/",
+   "category": "Uncategorized",
+   "alert": "Front-end cache servers are hitting maximum thread limits, leading to increased latency and failed requests. Downstream services are reporting timeouts and connection errors.",
+   "alert2": "A critical service is experiencing high thread usage and is unable to handle new requests. Multiple dependent services are now showing signs of degradation.",
+   "lesson": "A misconfigured thread limit caused a cascading failure across multiple services. Review thread pool configurations and ensure they are aligned with expected load.",
+   "wrong_lesson": "The problem was caused by an insufficient number of servers. The solution was to add more instances to the fleet."
+  },
+  {
+   "id": "PM-091",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/65649/",
+   "category": "Uncategorized",
+   "alert": "SimpleDB storage nodes are disconnecting due to handshake timeouts. Healthy nodes are failing to rejoin the cluster and are being marked as offline.",
+   "alert2": "A large number of nodes are failing to establish connections, leading to cluster instability. Handshake timeouts are preventing nodes from rejoining the cluster.",
+   "lesson": "Aggressive handshake timeouts and rapid de-registration of nodes caused a cascading failure. Adjust timeout thresholds and ensure redundancy in critical services.",
+   "wrong_lesson": "The issue was caused by a power outage. The fix was to ensure all nodes have redundant power supplies."
+  },
+  {
+   "id": "PM-092",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/17908/",
+   "category": "Uncategorized",
+   "alert": "Direct Connect to Tokyo is experiencing intermittent connectivity drops. Multiple devices in the network layer are showing high latency and packet loss. Traffic patterns are fluctuating unpredictably.",
+   "alert2": "A subset of Direct Connect endpoints are now unreachable. Network monitoring shows a spike in dropped packets and failed health checks. Some services are timing out during data transfers.",
+   "lesson": "Latent defects in software can be triggered by specific traffic patterns. Ensure monitoring systems detect anomalies and trigger alerts before failures escalate.",
+   "wrong_lesson": "The issue was caused by a misconfigured network device. Ensure all devices are properly configured and tested before deployment."
+  },
+  {
+   "id": "PM-093",
+   "company": "Amazon",
+   "url": "https://aws.amazon.com/message/061323/",
+   "category": "Uncategorized",
+   "alert": "Lambda invocations are failing in a specific region. Execution Environments are being created but not responding to requests. STS and EKS are also showing degraded performance.",
+   "alert2": "A large number of Lambda functions are timing out. EventBridge is not processing events correctly. The AWS Management Console is unresponsive in one region.",
+   "lesson": "Scaling can expose latent software defects. Monitor for unexpected behavior during scale events and validate system thresholds.",
+   "wrong_lesson": "The issue was caused by insufficient resources. Ensure all services have adequate capacity and auto-scaling is properly configured."
+  },
+  {
+   "id": "PM-095",
+   "company": "AppNexus",
+   "url": "https://web.archive.org/web/20250505112812/https://medium.com/xandr-tech/2013-09-17-outage-postmortem-586b19ae4307",
+   "category": "Uncategorized",
+   "alert": "A number of impression bus servers have crashed simultaneously. There is no clear pattern in the affected instances. Database updates are suspected.",
+   "alert2": "Multiple servers are experiencing unexpected crashes. The issue appears to be triggered by a specific database operation. Some services are now unresponsive.",
+   "lesson": "Time-dependent bugs can be difficult to catch in staging environments. Implement testing scenarios that mimic real-world timing conditions.",
+   "wrong_lesson": "The issue was caused by a faulty database update. Ensure all database changes are thoroughly tested in staging before deployment."
+  },
+  {
+   "id": "PM-096",
+   "company": "AT&T",
+   "url": "https://users.csc.calpoly.edu/~jdalbey/SWE/Papers/att_collapse.html",
+   "category": "Uncategorized",
+   "alert": "The core routing service is experiencing repeated restarts, causing widespread connectivity issues across multiple nodes. Users are reporting dropped calls and failed connections. The system is cycling through reboots without stabilizing.",
+   "alert2": "A critical communication hub is failing to maintain uptime, with intermittent outages affecting several regions. Metrics show a spike in failed requests and increased latency. The service is entering a loop of crashes and restarts.",
+   "lesson": "A race condition in the system's core logic led to cascading failures. Ensure all critical components are tested for concurrency and edge cases, especially after updates or outages.",
+   "wrong_lesson": "A misconfigured load balancer caused the service to fail. Ensure all load balancer settings are reviewed and validated before deploying changes."
+  },
+  {
+   "id": "PM-097",
+   "company": "Atlassian",
+   "url": "https://www.atlassian.com/engineering/post-incident-review-april-2022-outage",
+   "category": "Uncategorized",
+   "alert": "Multiple Atlassian services are unreachable, with users unable to access their accounts or collaborate. Dashboard metrics show a complete drop in active users and API response times are extremely high.",
+   "alert2": "A subset of customers is still experiencing downtime, with some services remaining offline for over a week. Internal monitoring shows inconsistent recovery progress across regions.",
+   "lesson": "A single point of failure in the infrastructure caused prolonged outages. Implement redundancy and failover mechanisms for critical services to prevent extended downtime.",
+   "wrong_lesson": "A failed software update caused the outage. Ensure all updates are thoroughly tested in staging environments before deployment."
+  },
+  {
+   "id": "PM-098",
+   "company": "Basecamp",
+   "url": "https://signalvnoise.com/posts/3729-basecamp-network-attack-postmortem",
+   "category": "Uncategorized",
+   "alert": "The primary network gateway is experiencing high traffic volumes, leading to degraded performance and partial service unavailability. Users are reporting timeouts and connection failures.",
+   "alert2": "A critical API endpoint is unreachable, with increased latency and failed requests. Internal metrics show a surge in traffic that exceeds normal thresholds.",
+   "lesson": "A DDoS attack overwhelmed the network infrastructure. Implement robust traffic filtering and rate-limiting strategies to mitigate such attacks.",
+   "wrong_lesson": "A misconfigured firewall blocked legitimate traffic. Ensure all firewall rules are reviewed and updated regularly."
+  },
+  {
+   "id": "PM-099",
+   "company": "Basecamp",
+   "url": "https://web.archive.org/web/20220529044310/https://m.signalvnoise.com/postmortem-on-the-read-only-outage-of-basecamp-on-november-9th-2018/",
+   "category": "Uncategorized",
+   "alert": "The database is in read-only mode, preventing new data from being written. Users are unable to submit new entries or update existing records. System logs show an integer overflow error.",
+   "alert2": "A critical data store is experiencing unexpected behavior, with write operations failing and read operations being delayed. Metrics indicate a sudden increase in error rates.",
+   "lesson": "An integer overflow caused the database to enter read-only mode. Monitor data types and scaling limits to avoid unexpected behavior in production.",
+   "wrong_lesson": "A database backup failed, leading to data loss. Ensure regular backups are performed and tested to prevent data loss during outages."
+  },
+  {
+   "id": "PM-100",
+   "company": "BBC Online",
+   "url": "https://www.bbc.co.uk/blogs/internet/entries/a37b0470-47d4-3991-82bb-a7d5b8803771",
+   "category": "Uncategorized",
+   "alert": "Multiple services are experiencing high latency and intermittent failures. Users are reporting timeouts when trying to access content.",
+   "alert2": "A critical service is showing increased error rates and degraded performance. Dashboard metrics indicate a spike in request failures and slow response times.",
+   "lesson": "Caching database responses locally can prevent cascading failures during high load. Ensure all services have proper caching mechanisms in place.",
+   "wrong_lesson": "Increasing database capacity immediately resolved the issue. Ensure that database resources are always sufficient for peak traffic."
+  },
+  {
+   "id": "PM-101",
+   "company": "Bintray",
+   "url": "https://web.archive.org/web/20210421222929/https://status.bintray.com/incidents/w4dfr0rpznkt",
+   "category": "Uncategorized",
+   "alert": "Several internal tools are failing to load dependencies. Users are encountering errors when trying to access certain features.",
+   "alert2": "A key service is showing unexpected behavior. Metrics indicate that some dependencies are not being resolved correctly.",
+   "lesson": "Regularly audit third-party dependencies for integrity and authenticity. Implement strict validation and monitoring for package sources.",
+   "wrong_lesson": "The issue was caused by a misconfigured build system. Ensure that all dependencies are properly configured and validated."
+  },
+  {
+   "id": "PM-102",
+   "company": "BrowserStack",
+   "url": "https://www.browserstack.com/attack-and-downtime-on-9-November",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing unauthorized access. Users are reporting unexpected changes to their data.",
+   "alert2": "A system is showing signs of data tampering. Metrics indicate unusual activity and unauthorized modifications to resources.",
+   "lesson": "Ensure all legacy systems are decommissioned or patched. Regularly review access controls and system vulnerabilities.",
+   "wrong_lesson": "The issue was due to a misconfigured firewall. Ensure that all systems have proper network security settings."
+  },
+  {
+   "id": "PM-103",
+   "company": "Buildkite",
+   "url": "https://building.buildkite.com/outage-post-mortem-for-august-23rd-82b619a3679b",
+   "category": "Uncategorized",
+   "alert": "A key service is failing to handle peak traffic. Users are experiencing timeouts and service unavailability.",
+   "alert2": "A dependent system is showing signs of overload. Metrics indicate that the service is unable to process incoming requests.",
+   "lesson": "Avoid reducing database capacity without proper testing. Ensure that infrastructure can scale to meet demand during peak times.",
+   "wrong_lesson": "The issue was caused by a misconfigured load balancer. Ensure that all infrastructure components are properly configured."
+  },
+  {
+   "id": "PM-104",
+   "company": "Bungie",
+   "url": "https://web.archive.org/web/20230504222953/https://www.bungie.net/en/News/Article/48723",
+   "category": "Uncategorized",
+   "alert": "The dashboard shows a significant drop in data ingestion across multiple servers. Metrics indicate that the service is not processing new requests. Users are reporting missing data in their feeds.",
+   "alert2": "A secondary service is experiencing a spike in failed requests. System logs show that the service is rejecting incoming data. The monitoring tool is showing a red alert for data loss.",
+   "lesson": "Inadequate testing of configuration changes can lead to unintended data loss. Ensure all changes are validated in staging and monitored closely in production.",
+   "wrong_lesson": "The issue was caused by a misconfigured database connection. Fixing the connection settings resolved the problem."
+  },
+  {
+   "id": "PM-105",
+   "company": "CCP Games",
+   "url": "https://community.eveonline.com/news/dev-blogs/behind-the-scenes-of-a-long-eve-online-downtime/",
+   "category": "Uncategorized",
+   "alert": "Cluster nodes are going offline during startup. The system health dashboard shows a high number of failed connections. Users are experiencing service interruptions.",
+   "alert2": "The logging service is showing an unusual number of errors during node initialization. Metrics indicate that nodes are timing out during the boot process.",
+   "lesson": "Improperly configured logging channels can cause node failures during startup. Review logging configurations and ensure they are compatible with the cluster setup.",
+   "wrong_lesson": "The issue was caused by a bug in the new game patch. Reverting the patch fixed the problem."
+  },
+  {
+   "id": "PM-106",
+   "company": "Chef.io",
+   "url": "https://www.chef.io/blog/2014/07/10/supermarket-intermittent-unresponsiveness-postmortem/",
+   "category": "Uncategorized",
+   "alert": "The main service is unresponsive and showing high latency. Users are unable to access key features. The health check dashboard is showing timeouts.",
+   "alert2": "The system is experiencing intermittent slowdowns. Metrics show that the service is not responding to health checks within the expected timeframe.",
+   "lesson": "Low health check timeouts can prevent the system from detecting and recovering from failures. Increase timeouts and ensure they align with service SLAs.",
+   "wrong_lesson": "The issue was caused by a third-party API slowdown. Increasing the timeout for the API call resolved the problem."
+  },
+  {
+   "id": "PM-107",
+   "company": "CircleCI",
+   "url": "https://circleci.statuspage.io/incidents/hr0mm9xmm3x6",
+   "category": "Uncategorized",
+   "alert": "The queue system is processing requests extremely slowly. Users are seeing delays in task completion. The monitoring tool shows a drastic drop in throughput.",
+   "alert2": "A large number of tasks are backing up in the queue. System metrics indicate that the queue is handling only one task per minute. Users are reporting timeouts.",
+   "lesson": "Unexpected traffic spikes can overwhelm queue systems if they are not properly scaled. Monitor queue performance and ensure it can handle sudden load increases.",
+   "wrong_lesson": "The issue was caused by a bug in the queue processing logic. Fixing the logic improved performance."
+  },
+  {
+   "id": "PM-108",
+   "company": "CircleCI",
+   "url": "https://circleci.com/blog/jan-4-2023-incident-report/",
+   "category": "Uncategorized",
+   "alert": "Our monitoring system detected unusual activity on the internal authentication service. Multiple login attempts from an unknown IP address were observed, and some sessions showed signs of being hijacked.",
+   "alert2": "A dashboard flagged a spike in failed login attempts across the user management system. Some users reported being logged out unexpectedly, and metrics showed a drop in active sessions.",
+   "lesson": "Inadequate detection of malicious activity in session management systems can lead to unauthorized access. Ensure robust monitoring, anomaly detection, and session validation mechanisms are in place.",
+   "wrong_lesson": "The lack of 2FA on the system allowed attackers to bypass authentication. Enable 2FA across all services to prevent unauthorized access."
+  },
+  {
+   "id": "PM-109",
+   "company": "CircleCI",
+   "url": "https://web.archive.org/web/20180121023549/http://circleci.com/blog/mongohq-security-incident-response/",
+   "category": "Uncategorized",
+   "alert": "A critical service experienced a sudden increase in failed authentication attempts. Some users reported being locked out of their accounts, and internal dashboards showed a spike in invalid token usage.",
+   "alert2": "A security alert indicated that a large number of API requests were being rejected due to invalid credentials. Some internal systems showed a drop in successful authentication rates.",
+   "lesson": "Storing sensitive credentials in a single database without proper encryption or access controls can lead to massive data breaches. Implement encryption, access controls, and regular credential rotation.",
+   "wrong_lesson": "The breach was caused by a misconfigured firewall. Ensure all network boundaries are properly configured to prevent unauthorized access."
+  },
+  {
+   "id": "PM-111",
+   "company": "CircleCI",
+   "url": "https://discuss.circleci.com/t/postmortem-may-21-2021-delay-in-starting-docker-jobs-machine-remote-docker-environments-blocked/40274",
+   "category": "Uncategorized",
+   "alert": "A critical queue service started rejecting messages, and some consumers were being disconnected unexpectedly. Metrics showed a spike in queue backlogs and connection errors.",
+   "alert2": "A monitoring tool flagged a sudden increase in channel closures for a specific queue. Some services reported that tasks were not being processed in a timely manner.",
+   "lesson": "Inadequate testing of queue upgrades can lead to unexpected behavior and service disruptions. Always validate changes in staging environments and monitor for side effects.",
+   "wrong_lesson": "The queue was configured incorrectly, leading to message loss. Ensure all queues are properly configured and monitored for errors."
+  },
+  {
+   "id": "PM-112",
+   "company": "CircleCI",
+   "url": "https://status.circleci.com/incidents/dcqb3fykhgvg",
+   "category": "Uncategorized",
+   "alert": "Multiple nodes in the cluster are reporting sync failures for iptables rules. Service-to-service communication is intermittently dropping, and some endpoints are unreachable.",
+   "alert2": "A subset of nodes is experiencing sync errors in their network policy enforcement. Internal traffic is being dropped, and some services are timing out unexpectedly.",
+   "lesson": "Incompatible versions of critical components can lead to silent data corruption. Always verify compatibility and test upgrades in staging before production.",
+   "wrong_lesson": "The issue was caused by a misconfigured firewall rule. Ensure all firewall rules are properly tested and validated before deployment."
+  },
+  {
+   "id": "PM-113",
+   "company": "Cloudflare",
+   "url": "https://web.archive.org/web/20211029020126/https://blog.cloudflare.com/incident-report-on-memory-leak-caused-by-cloudflare-parser-bug/",
+   "category": "Uncategorized",
+   "alert": "Several edge servers are returning HTTP responses with unexpected data in the headers. Users are reporting sensitive information in their browser consoles.",
+   "alert2": "A number of requests are returning payloads that include private data. Internal monitoring shows memory leaks in the response headers.",
+   "lesson": "Parser bugs can expose sensitive data through memory leaks. Regularly audit data handling and ensure all data is properly sanitized.",
+   "wrong_lesson": "The issue was caused by a misconfigured access control list. Ensure all access controls are properly set and reviewed."
+  },
+  {
+   "id": "PM-115",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/cloudflare-incident-on-august-21-2025/",
+   "category": "Uncategorized",
+   "alert": "A significant portion of traffic is being rerouted through alternate paths. Some services are experiencing increased latency and packet loss.",
+   "alert2": "Traffic from a single customer is overwhelming the network links. BGP withdrawals are causing unexpected routing changes and increased congestion.",
+   "lesson": "Network congestion and BGP issues can lead to routing anomalies. Monitor traffic patterns and ensure sufficient link capacity and redundancy.",
+   "wrong_lesson": "The issue was caused by a misconfigured routing policy. Ensure all routing policies are properly configured and reviewed."
+  },
+  {
+   "id": "PM-116",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/",
+   "category": "Uncategorized",
+   "alert": "The primary data store for our service is unreachable, and all read and write operations are failing. Users are unable to access their data, and internal dashboards show zero throughput.",
+   "alert2": "A critical service is experiencing high latency and partial unavailability. Metrics show a spike in failed requests and a drop in successful operations across multiple endpoints.",
+   "lesson": "Ensure redundancy and failover mechanisms are in place for critical data stores. Regularly test disaster recovery procedures and monitor for signs of external service failures.",
+   "wrong_lesson": "The issue was caused by a misconfigured firewall rule. Ensure all network access is properly restricted and monitored."
+  },
+  {
+   "id": "PM-117",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/how-cloudflare-mitigated-yet-another-okta-compromise/",
+   "category": "Uncategorized",
+   "alert": "An unauthorized user has accessed our internal support system, and several administrative actions are being performed. Dashboard metrics show unusual activity in the admin panel.",
+   "alert2": "A suspicious login attempt was detected from an unknown IP address. The system is showing signs of potential unauthorized access to sensitive administrative functions.",
+   "lesson": "Implement strict access controls and continuous monitoring for anomalies in authentication systems. Regularly audit access logs and ensure multi-factor authentication is enforced.",
+   "wrong_lesson": "The problem was due to a misconfigured API key. Ensure all API keys are stored securely and rotated regularly."
+  },
+  {
+   "id": "PM-118",
+   "company": "Cloudflare",
+   "url": "https://blog.cloudflare.com/response-to-salesloft-drift-incident/",
+   "category": "Uncategorized",
+   "alert": "An unknown entity has accessed our internal support portal and is downloading large amounts of data. Internal monitoring shows unusual data transfer activity.",
+   "alert2": "A user account is exhibiting abnormal behavior, including unauthorized data access and large file downloads. Security tools are flagging this as a potential breach.",
+   "lesson": "Secure third-party integrations with strong authentication and limit access to only necessary systems. Regularly audit and monitor for unauthorized access attempts.",
+   "wrong_lesson": "The issue was caused by a weak password policy. Ensure all users follow strong password guidelines and change passwords regularly."
+  },
+  {
+   "id": "PM-119",
+   "company": "CrowdStrike",
+   "url": "https://www.crowdstrike.com/falcon-content-update-remediation-and-guidance-hub/",
+   "category": "Uncategorized",
+   "alert": "A recent content update is causing system crashes on a large number of user devices. Internal metrics show a sharp increase in critical errors and system reboots.",
+   "alert2": "A deployment introduced a bug that is triggering unexpected behavior in the operating system. Users are reporting system instability and crashes.",
+   "lesson": "Implement rigorous validation and testing processes for all content updates. Ensure automated checks are in place to catch errors before deployment.",
+   "wrong_lesson": "The problem was due to a missing dependency in the deployment. Ensure all required libraries and dependencies are included in the build process."
+  },
+  {
+   "id": "PM-120",
+   "company": "Datadog",
+   "url": "https://www.datadoghq.com/blog/2023-03-08-multiregion-infrastructure-connectivity-issue/",
+   "category": "Uncategorized",
+   "alert": "All network traffic to the service is being dropped. Dashboard shows zero active connections and no incoming packets. The service is unreachable from external sources.",
+   "alert2": "A critical service is experiencing full connectivity loss. Metrics show no active endpoints and a spike in failed connection attempts. Internal tools are reporting no available nodes.",
+   "lesson": "Automated upgrades can inadvertently remove critical configuration. Ensure rollback mechanisms and configuration validation are in place during deployments.",
+   "wrong_lesson": "The upgrade process was unstable and needed to be fixed. Ensure all upgrades are tested in staging before production."
+  },
+  {
+   "id": "PM-121",
+   "company": "Discord",
+   "url": "https://status.discordapp.com/incidents/dj3l6lw926kl",
+   "category": "Uncategorized",
+   "alert": "A key service is experiencing a sudden surge in traffic. System metrics show memory usage at 100% and queue lengths spiking. Users are reporting timeouts.",
+   "alert2": "A service is receiving an unexpected influx of requests. Memory usage is critically high and queues are filling up. Endpoints are timing out.",
+   "lesson": "Flapping services can trigger cascading failures. Implement circuit breakers and rate limiting to prevent overload.",
+   "wrong_lesson": "The service was misconfigured and needed more resources. Scale up the service and add more memory."
+  },
+  {
+   "id": "PM-122",
+   "company": "Discord",
+   "url": "https://status.discordapp.com/incidents/qk9cdgnqnhcn",
+   "category": "Uncategorized",
+   "alert": "A primary database instance is marked as offline. Cluster metrics show a rebalance in progress. Internal services are timing out on database connections.",
+   "alert2": "A critical service is experiencing connection failures. Metrics show a high number of failed retries and a drop in active connections. The service is partially down.",
+   "lesson": "Failover processes must be tested and monitored. Ensure services handle Redis rebalancing gracefully and have fallback mechanisms.",
+   "wrong_lesson": "The database was not properly configured for high availability. Add more replicas and ensure failover is automated."
+  },
+  {
+   "id": "PM-123",
+   "company": "Dropbox",
+   "url": "https://blogs.dropbox.com/tech/2014/01/outage-post-mortem/",
+   "category": "Uncategorized",
+   "alert": "A number of servers are no longer responding. System logs show unexpected shutdowns. Critical databases are offline and not accessible.",
+   "alert2": "A batch of machines has disappeared from the network. Metrics show a drop in active hosts and database services are unreachable.",
+   "lesson": "Scheduled maintenance or upgrades can cause unintended system downtime. Validate system health and ensure backups are in place.",
+   "wrong_lesson": "The OS upgrade was not properly tested. Ensure all upgrades are tested in staging and rollback is available."
+  },
+  {
+   "id": "PM-124",
+   "company": "Duo",
+   "url": "https://status.duo.com/incidents/4w07bmvnt359",
+   "category": "Uncategorized",
+   "alert": "The user authentication service is experiencing high latency and partial unavailability. Dashboard metrics show a spike in queue length and database connection errors.",
+   "alert2": "The payment processing system is showing increased error rates and timeouts. Metrics indicate the database is being overwhelmed and unable to keep up with request volume.",
+   "lesson": "Inadequate capacity planning and monitoring led to a cascading failure. Ensure systems are scaled appropriately and have robust alerting for queue and database health.",
+   "wrong_lesson": "The database was not properly configured for high traffic. Ensure the database is tuned for performance and has sufficient resources."
+  },
+  {
+   "id": "PM-125",
+   "company": "Epic Games",
+   "url": "https://web.archive.org/web/20220430011642/https://www.epicgames.com/fortnite/en-US/news/postmortem-of-service-outage-at-3-4m-ccu",
+   "category": "Uncategorized",
+   "alert": "The main application service is down with widespread errors. User reports indicate the service is unreachable and response times are extremely high.",
+   "alert2": "The API gateway is showing a surge in failed requests and timeouts. Metrics show a sharp increase in traffic beyond expected thresholds.",
+   "lesson": "Poor handling of unexpected traffic spikes led to service disruptions. Implement auto-scaling and circuit breakers to manage extreme load.",
+   "wrong_lesson": "The service was not properly load balanced. Ensure traffic is distributed evenly across all instances."
+  },
+  {
+   "id": "PM-126",
+   "company": "European Space Agency",
+   "url": "https://en.wikipedia.org/wiki/Cluster_%28spacecraft%29?oldid=217305667",
+   "category": "Uncategorized",
+   "alert": "A critical system is generating unexpected error messages and crashing. Dashboard shows a sudden spike in invalid data being processed.",
+   "alert2": "A core component is failing with unhandled exceptions. Metrics indicate an unusual data type is being passed through the system.",
+   "lesson": "An overflow in an unused code path caused a critical failure. Ensure all code paths are validated and error handling is in place for all data types.",
+   "wrong_lesson": "The system was not properly configured for large data inputs. Ensure input validation and data type checks are enforced."
+  },
+  {
+   "id": "PM-127",
+   "company": "Elastic",
+   "url": "https://www.elastic.co/blog/elastic-cloud-january-18-2019-incident-report",
+   "category": "Uncategorized",
+   "alert": "Cluster access is severely degraded with high latency and frequent timeouts. Users are unable to connect to their deployments.",
+   "alert2": "All deployments in the region are unreachable. Metrics show a complete outage for the entire region's infrastructure.",
+   "lesson": "A regional outage caused widespread cluster unavailability. Ensure redundancy and failover mechanisms are in place for critical regions.",
+   "wrong_lesson": "The cluster configuration was incorrect. Ensure all deployments are properly configured and validated."
+  },
+  {
+   "id": "PM-128",
+   "company": "ESLint",
+   "url": "https://eslint.org/blog/2018/07/postmortem-for-malicious-package-publishes",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing unexpected package installations. Multiple packages are being downloaded from an unknown source. The system is detecting unauthorized activity in the dependency chain.",
+   "alert2": "A key service is showing signs of tampering. An unusual number of packages are being installed, and some are flagged as containing suspicious code. The system is reporting unexpected changes in the dependency graph.",
+   "lesson": "Ensure all package management systems are secured with strong authentication and monitoring. Regularly audit dependencies for unauthorized changes and implement automated detection mechanisms.",
+   "wrong_lesson": "Use stricter access controls on package repositories to prevent unauthorized uploads. Regularly scan packages for malicious content."
+  },
+  {
+   "id": "PM-129",
+   "company": "Etsy",
+   "url": "https://blog.etsy.com/news/2012/demystifying-site-outages/",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing database errors. Multiple operations are failing with unexpected ID overflow. The system is showing signs of data inconsistency.",
+   "alert2": "A key service is encountering database failures. Some operations are timing out, and the system is reporting unexpected data corruption. The service is showing signs of instability.",
+   "lesson": "Implement robust database versioning and compatibility checks during deployments. Ensure rollback mechanisms are in place to handle unexpected upgrades or configuration changes.",
+   "wrong_lesson": "Use larger integer types for IDs to prevent overflow. Monitor database performance during upgrades."
+  },
+  {
+   "id": "PM-130",
+   "company": "Fastly",
+   "url": "https://www.fastly.com/blog/summary-of-june-8-outage",
+   "category": "Uncategorized",
+   "alert": "A core service is experiencing a global outage. All endpoints are unreachable. The system is showing no response from any internal services.",
+   "alert2": "A critical service is down across all regions. No traffic is being processed, and internal health checks are failing. The system is unresponsive to all requests.",
+   "lesson": "Ensure comprehensive testing of new software changes, especially in production environments. Implement robust monitoring and alerting for unexpected behavior.",
+   "wrong_lesson": "Use more reliable third-party services to avoid single points of failure. Implement failover mechanisms for critical components."
+  },
+  {
+   "id": "PM-131",
+   "company": "Flowdock",
+   "url": "https://web.archive.org/web/20220704223244/https://flowdock-resources.s3.amazonaws.com/legal/Flowdock-RCA-For-Incident-On-2020-04-21.pdf",
+   "category": "Uncategorized",
+   "alert": "A key service is experiencing high CPU usage. The application is unresponsive, and database queries are timing out. Users are reporting data loss.",
+   "alert2": "A critical service is showing signs of instability. CPU usage is at 100%, and the database is hanging. Some user data may have been lost.",
+   "lesson": "Monitor system resource usage during unexpected traffic spikes. Implement database failover and data replication to prevent data loss.",
+   "wrong_lesson": "Upgrade the database hardware to handle higher loads. Implement load balancing to distribute traffic more evenly."
+  },
+  {
+   "id": "PM-132",
+   "company": "Foursquare",
+   "url": "https://web.archive.org/web/20230602082218/https://news.ycombinator.com/item?id=1769761",
+   "category": "Uncategorized",
+   "alert": "The database service is experiencing high latency and unresponsive queries. Users are reporting timeouts when accessing their data. Metrics show memory usage is approaching 100%.",
+   "alert2": "A critical service is showing signs of memory exhaustion. Query response times are increasing, and the system is failing to handle new requests. Monitoring hasn't flagged the issue yet.",
+   "lesson": "Poor query patterns and lack of monitoring can lead to catastrophic failures. Ensure queries are optimized for locality and implement real-time memory and performance monitoring.",
+   "wrong_lesson": "Insufficient memory allocation caused the failure. Increase the memory limit for the database service to prevent similar incidents."
+  },
+  {
+   "id": "PM-133",
+   "company": "Gentoo",
+   "url": "https://wiki.gentoo.org/wiki/Github/2018-06-28",
+   "category": "Uncategorized",
+   "alert": "A user has unexpectedly removed access for all team members in the GitHub organization. No one can push or pull from the repositories. The dashboard shows unauthorized access attempts.",
+   "alert2": "A suspicious account has taken control of the organization's repositories. All developers have been locked out. The system is detecting unusual commit activity.",
+   "lesson": "Lack of access control and monitoring can lead to unauthorized changes. Implement multi-factor authentication and real-time access anomaly detection.",
+   "wrong_lesson": "The user had administrative privileges and was unaware of the security risks. Restricting access to only necessary roles would have prevented the issue."
+  },
+  {
+   "id": "PM-135",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/the-library/denial-of-service-attacks/",
+   "category": "Uncategorized",
+   "alert": "A large number of HTTP requests are hitting a specific endpoint, causing SSL connections to fail. Users are unable to access the service. The system is not detecting the traffic as a DDoS.",
+   "alert2": "The service is experiencing a high volume of traffic that is overwhelming the SSL layer. Monitoring is not capturing the attack as a DDoS. Connection rates are spiking.",
+   "lesson": "Monitoring based on bandwidth alone can miss DDoS attacks. Implement packet-per-second thresholds and real-time traffic analysis for early detection.",
+   "wrong_lesson": "The SSL configuration was outdated and vulnerable to attacks. Updating the SSL protocol and certificates would have resolved the issue."
+  },
+  {
+   "id": "PM-136",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/company-news/github-availability-report-july-2024/",
+   "category": "Uncategorized",
+   "alert": "The 'Resource Manager' service reported an unexpected deletion of critical infrastructure. Chat latency spiked to over 60% and error rates are climbing.",
+   "alert2": "The 'CloudOps Dashboard' is showing a large number of missing resources in the 'Production' environment. Users are reporting intermittent failures in the 'Communication Hub' service.",
+   "lesson": "Ensure that automated cleanup processes are properly scoped and have safeguards against accidental deletion of critical infrastructure. Regularly review and test cleanup scripts in staging environments.",
+   "wrong_lesson": "The issue was caused by a misconfigured cleanup script. The fix was to reconfigure the script to exclude critical resources."
+  },
+  {
+   "id": "PM-137",
+   "company": "GitHub",
+   "url": "https://github.blog/news-insights/company-news/github-availability-report-october-2024/",
+   "category": "Uncategorized",
+   "alert": "DNS resolution is failing for the 'Code Search' service. Users are unable to access search functionality and internal tools are reporting timeouts.",
+   "alert2": "The 'Global DNS Resolver' is experiencing cascading failures. Some internal services are unreachable and there's a noticeable delay in resolving domain names.",
+   "lesson": "DNS infrastructure should be designed with redundancy and failover mechanisms. Recovery processes must account for potential cascading failures and include temporary solutions like deploying emergency resolvers.",
+   "wrong_lesson": "The problem was due to a failed DNS server. The fix was to restart the server and reconfigure the DNS settings."
+  },
+  {
+   "id": "PM-138",
+   "company": "Gitlab",
+   "url": "https://docs.google.com/document/d/1ScqXAdb6BjhsDzCo3qdPYbt1uULzgZqPO8zHeHHarS0/preview?sle=true&hl=en&forcehl=1#heading=h.dfbilqgnc5sf",
+   "category": "Uncategorized",
+   "alert": "The 'Primary Node' service is unresponsive and has been restarted. Users are experiencing a global outage and critical features are unavailable.",
+   "alert2": "The 'System Manager' reports that the primary node was brought back online with incorrect filesystem settings. All services are down and the system is in an unstable state.",
+   "lesson": "Ensure that system restarts are properly validated and that filesystem configurations are correctly applied. Implement checks to verify the integrity of critical system components post-restart.",
+   "wrong_lesson": "The issue was caused by a failed hardware component. The fix was to replace the hardware and reconfigure the system."
+  },
+  {
+   "id": "PM-139",
+   "company": "Gitlab",
+   "url": "https://about.gitlab.com/2017/02/10/postmortem-of-database-outage-of-january-31/",
+   "category": "Uncategorized",
+   "alert": "The 'Database Service' is experiencing high latency and replication is lagging. Users are reporting slow response times and some features are unavailable.",
+   "alert2": "The 'Data Sync' service is showing signs of data loss. The 'Storage Manager' reports that a critical directory was deleted, leading to missing data.",
+   "lesson": "Monitor database performance and replication health closely. Implement safeguards to prevent accidental deletion of critical data directories and ensure data backups are up to date.",
+   "wrong_lesson": "The issue was caused by a misconfigured replication process. The fix was to reconfigure the replication settings and restart the database service."
+  },
+  {
+   "id": "PM-140",
+   "company": "Google",
+   "url": "https://gist.github.com/jomo/2bae3821acb433d0446d",
+   "category": "Uncategorized",
+   "alert": "A large number of email notifications were sent to users unexpectedly. The system is showing multiple duplicate messages for the same user.",
+   "alert2": "A service named 'NotificationHub' is experiencing a spike in outgoing messages, with some users receiving multiple identical alerts.",
+   "lesson": "A non-atomic operation in batch processing led to duplicate notifications. Ensure all operations are atomic and state is updated correctly before sending messages.",
+   "wrong_lesson": "A misconfigured email template caused duplicate messages. Review and correct the email template logic."
+  },
+  {
+   "id": "PM-141",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incidents/X8SNkK2BPyCrc1sveeiu",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing global API throttling, with read operations failing across all regions.",
+   "alert2": "A service named 'DataAccess' is showing widespread API failures, with no progress updates available for ongoing operations.",
+   "lesson": "Global API quotas can be overwhelmed by internal services, leading to widespread outages. Monitor and limit external traffic to API endpoints.",
+   "wrong_lesson": "A misconfigured rate limit caused the outage. Adjust the rate limit settings to allow more requests."
+  },
+  {
+   "id": "PM-142",
+   "company": "Google",
+   "url": "https://www.google.com/appsstatus/dashboard/incidents/k71P8nHp32hgcMSsC3mR",
+   "category": "Uncategorized",
+   "alert": "Some users are experiencing intermittent video playback issues during livestreams. Latency and rebuffering are reported for a small subset of viewers.",
+   "alert2": "A service named 'StreamService' is showing increased latency and rebuffering for a portion of users during a livestream.",
+   "lesson": "Intermittent quality issues in streaming services can be caused by network or backend configuration problems. Monitor latency and rebuffering metrics closely.",
+   "wrong_lesson": "A bug in the video encoding process caused the issue. Update the encoding pipeline to fix the problem."
+  },
+  {
+   "id": "PM-143",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incidents/mREMLwZFe3FuLLn3zfTw",
+   "category": "Uncategorized",
+   "alert": "A service named 'WriteAPI' is experiencing high error rates and is unresponsive to incoming requests. Logging and traffic metrics are spiking.",
+   "alert2": "A streaming service is showing increased latency and error rates, with some regions affected more than others.",
+   "lesson": "A deadlock in the internal RPC library can cause service overload. Ensure internal libraries are robust and handle edge cases properly.",
+   "wrong_lesson": "A misconfigured firewall rule blocked incoming traffic. Review and adjust the firewall settings to allow more requests."
+  },
+  {
+   "id": "PM-144",
+   "company": "Google",
+   "url": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW",
+   "category": "Uncategorized",
+   "alert": "The Service Control dashboard is showing multiple instances of a critical error, with several regions reporting service unavailability. Metrics indicate a high number of failed requests and system crashes across the global infrastructure.",
+   "alert2": "A key service is experiencing intermittent outages, with some regions reporting 100% error rates. The system is struggling to handle the load, and some endpoints are unreachable.",
+   "lesson": "Lack of feature flag protection and error handling in critical systems can lead to widespread outages. Ensure all code paths are protected and have robust error handling mechanisms in place.",
+   "wrong_lesson": "The issue was caused by a misconfigured policy, so adding more validation to the policy input should prevent it. Ensure all policy fields are non-nullable and properly validated."
+  },
+  {
+   "id": "PM-145",
+   "company": "GPS/GLONASS",
+   "url": "https://web.archive.org/web/20250903124227/https://www.gps.gov/governance/advisory/meetings/2014-06/beutler1.pdf",
+   "category": "Uncategorized",
+   "alert": "GPS satellites are reporting incorrect position data, which is causing navigation apps to show inaccurate locations. Multiple users are reporting significant deviations in their location tracking.",
+   "alert2": "A number of navigation systems are experiencing unexpected behavior, with some users reporting that their location data is not updating correctly. The issue seems to be affecting a large number of devices.",
+   "lesson": "Critical systems that rely on precise calculations must have robust validation and rollback mechanisms. Ensure that any changes to core logic are thoroughly tested and can be quickly reverted.",
+   "wrong_lesson": "The problem was due to a configuration error, so ensuring all settings are correctly applied should prevent it. Always double-check configuration files before deployment."
+  },
+  {
+   "id": "PM-147",
+   "company": "Heroku",
+   "url": "https://engineering.heroku.com/blogs/2017-02-15-filesystem-corruption-on-heroku-dynos/",
+   "category": "Uncategorized",
+   "alert": "The system is showing signs of filesystem corruption in running containers. Some containers are failing to start, and others are experiencing data inconsistencies.",
+   "alert2": "Multiple containers are reporting filesystem errors, with some services becoming unstable. The system is struggling to maintain data integrity across running instances.",
+   "lesson": "Critical checks that prevent filesystem corruption must remain active during upgrades. Ensure that all safety mechanisms are preserved and not inadvertently disabled during deployment.",
+   "wrong_lesson": "The issue was caused by a missing dependency, so ensuring all required libraries are included should prevent it. Always verify that all dependencies are properly installed before deployment."
+  },
+  {
+   "id": "PM-148",
+   "company": "Heroku",
+   "url": "https://blog.heroku.com/april-2022-incident-review",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing unauthorized data access. Multiple internal systems are showing unexpected data retrieval from unknown sources.",
+   "alert2": "A key API endpoint is returning sensitive information to external IPs. Internal monitoring tools are detecting unusual query patterns and data exposure.",
+   "lesson": "Ensure all sensitive credentials and tokens are securely stored and rotated. Implement strict access controls and monitor for unauthorized data access.",
+   "wrong_lesson": "The issue was caused by a misconfigured firewall. Ensure all network access is properly restricted and monitored."
+  },
+  {
+   "id": "PM-149",
+   "company": "Heroku",
+   "url": "https://status.heroku.com/incidents/2451",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing high latency and request failures. Dashboard metrics show a growing backlog in the task processing queue.",
+   "alert2": "A key component is failing readiness checks and being terminated. Autoscaling is not keeping up with the increasing traffic volume.",
+   "lesson": "Ensure alerting systems are configured to detect infrastructure failures early. Monitor autoscaling and workload scaling to prevent queue buildup.",
+   "wrong_lesson": "The issue was caused by a dependency upgrade. Ensure all dependencies are tested in staging environments before deployment."
+  },
+  {
+   "id": "PM-150",
+   "company": "Homebrew",
+   "url": "https://web.archive.org/web/20210813020247/https://brew.sh/2018/08/05/security-incident-disclosure/",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing unauthorized access to private repositories. Internal systems are showing unexpected push activity from unknown sources.",
+   "alert2": "A key API is being used to push changes to internal repositories. Monitoring tools are detecting unusual push activity from external IPs.",
+   "lesson": "Ensure all access tokens are securely stored and rotated. Monitor for unauthorized access to repositories and implement strict access controls.",
+   "wrong_lesson": "The issue was caused by a misconfigured CI/CD pipeline. Ensure all pipelines are properly secured and monitored."
+  },
+  {
+   "id": "PM-151",
+   "company": "Honeycomb",
+   "url": "https://www.honeycomb.io/blog/incident-review-designed-failing/",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing degraded query performance. Dashboard metrics show increased latency and higher error rates.",
+   "alert2": "A key component is failing to trigger alerts properly. SLOs are not being met, and the system is not responding to alerts in a timely manner.",
+   "lesson": "Ensure alerting systems are properly configured and tested. Monitor query performance and SLOs to detect and respond to issues quickly.",
+   "wrong_lesson": "The issue was caused by a misconfigured alerting rule. Ensure all alerting rules are properly configured and tested."
+  },
+  {
+   "id": "PM-152",
+   "company": "Honeycomb",
+   "url": "https://www.honeycomb.io/blog/incident-review-shepherd-cache-delays/",
+   "category": "Uncategorized",
+   "alert": "The ingestion pipeline has stopped processing data, and the dashboard shows no new entries. Users are reporting delays in data availability.",
+   "alert2": "The data processing service is unresponsive, and the queue is backing up. Metrics show a spike in error rates and a drop in throughput.",
+   "lesson": "Ensure redundancy and health checks are in place for critical data pipelines. Regularly validate system resilience under load.",
+   "wrong_lesson": "The issue was due to a misconfigured load balancer. Ensure all load balancers are properly configured and monitored."
+  },
+  {
+   "id": "PM-154",
+   "company": "incident.io",
+   "url": "https://incident.io/blog/intermittent-downtime",
+   "category": "Uncategorized",
+   "alert": "The application is crashing repeatedly, and the queue is filling up. Users are experiencing service interruptions.",
+   "alert2": "The service is unresponsive, and the system is showing unhandled errors. Metrics indicate a spike in panic events.",
+   "lesson": "Implement proper error handling and recovery mechanisms for async workers. Avoid unhandled panics in production.",
+   "wrong_lesson": "The issue was due to a memory leak. Ensure all memory usage is monitored and optimized."
+  },
+  {
+   "id": "PM-155",
+   "company": "incident.io",
+   "url": "https://incident.io/blog/clouds-caches-and-connection-conundrums",
+   "category": "Uncategorized",
+   "alert": "The database is timing out, and connections are failing. Users are unable to access their data.",
+   "alert2": "The cache is experiencing I/O timeouts, and the system is showing high latency. Metrics indicate a spike in connection errors.",
+   "lesson": "Monitor and tune connection pools and network agents. Investigate infrastructure changes for potential bottlenecks.",
+   "wrong_lesson": "The issue was due to a misconfigured database. Ensure all database settings are properly configured and monitored."
+  },
+  {
+   "id": "PM-156",
+   "company": "incident.io",
+   "url": "https://incident.io/blog/service-disruption-october-20th-2025",
+   "category": "Uncategorized",
+   "alert": "The incident.io platform is experiencing a significant backlog in on-call notifications. Users are reporting delayed alerts and dashboard metrics are showing unusually high latency.",
+   "alert2": "A critical service is showing signs of degradation with increased latency and partial unavailability. The on-call team is being paged multiple times due to a spike in error rates and failed requests.",
+   "lesson": "Failure to account for external dependencies and cascading failures can lead to complex incident responses. Teams should regularly review and test their alerting and notification systems under load.",
+   "wrong_lesson": "The issue was caused by a misconfigured alert threshold. Increasing the threshold and improving the notification queue should resolve the problem."
+  },
+  {
+   "id": "PM-157",
+   "company": "Indian Electricity Grid",
+   "url": "https://web.archive.org/web/20220124104632/https://cercind.gov.in/2012/orders/Final_Report_Grid_Disturbance.pdf",
+   "category": "Uncategorized",
+   "alert": "A major power outage has occurred across multiple regions. Dashboard metrics show a complete loss of connectivity and system availability.",
+   "alert2": "The power grid is experiencing repeated failures. Users are reporting widespread outages and service disruptions. The on-call team is being paged for a second time within hours.",
+   "lesson": "Lack of proper isolation and failover mechanisms in critical infrastructure can lead to prolonged outages. Teams should ensure redundancy and testing of grid-like systems.",
+   "wrong_lesson": "The issue was caused by a software bug in the grid management system. Fixing the bug and updating the system should prevent future outages."
+  },
+  {
+   "id": "PM-158",
+   "company": "Instapaper",
+   "url": "https://web.archive.org/web/20211124170124/https://medium.com/making-instapaper/instapaper-outage-cause-recovery-3c32a7e9cc5f",
+   "category": "Uncategorized",
+   "alert": "A hosted database is reaching its capacity limit. Users are experiencing slow query responses and partial service unavailability.",
+   "alert2": "The database is showing signs of degradation with increased latency and failed connections. The on-call team is being paged due to a spike in error rates and failed requests.",
+   "lesson": "Failure to monitor and scale database resources can lead to performance issues and outages. Teams should implement automated scaling and capacity planning.",
+   "wrong_lesson": "The issue was caused by a misconfigured database index. Rebuilding the index and optimizing queries should resolve the problem."
+  },
+  {
+   "id": "PM-159",
+   "company": "Intel",
+   "url": "https://web.archive.org/web/20241105190743/http://42gems.com/blog/?p=735",
+   "category": "Uncategorized",
+   "alert": "A critical calculation service is returning incorrect results. Users are reporting unexpected behavior and data inconsistencies.",
+   "alert2": "The system is experiencing intermittent failures in a key calculation module. The on-call team is being paged due to a spike in error rates and failed requests.",
+   "lesson": "Inadequate testing of edge cases and proof of correctness can lead to critical bugs. Teams should ensure rigorous testing and validation of all logic paths.",
+   "wrong_lesson": "The issue was caused by a software bug in the calculation module. Fixing the bug and updating the system should resolve the problem."
+  },
+  {
+   "id": "PM-160",
+   "company": "Joyent",
+   "url": "https://web.archive.org/web/20220528044329/https://www.joyent.com/blog/manta-postmortem-7-27-2015",
+   "category": "Uncategorized",
+   "alert": "The dashboard shows a critical error in the metadata service, with multiple failed requests and timeouts. Users are reporting issues accessing core features. The system is unresponsive to read and write operations.",
+   "alert2": "A key service is experiencing high latency and intermittent failures. Metrics show a spike in lock contention and failed transactions. End users are encountering errors when trying to access their data.",
+   "lesson": "Unnecessary global locks and maintenance tasks can cause critical service outages. Ensure all queries are optimized and avoid locking mechanisms that block essential operations.",
+   "wrong_lesson": "The issue was caused by a misconfigured PostgreSQL instance. Fixing the configuration and adding more resources resolved the problem."
+  },
+  {
+   "id": "PM-161",
+   "company": "Joyent",
+   "url": "https://web.archive.org/web/20220406095752/https://www.joyent.com/blog/postmortem-for-outage-of-us-east-1-may-27-2014",
+   "category": "Uncategorized",
+   "alert": "A large number of servers are rebooting unexpectedly. The dashboard shows a surge in reboot events and system unavailability. Users are unable to access their applications.",
+   "alert2": "Multiple instances are failing to respond to requests. Metrics indicate a high number of reboots and system instability. The API is experiencing widespread downtime.",
+   "lesson": "Tools with lax input validation can lead to unintended large-scale reboots. Always verify command parameters and use caution when executing maintenance actions.",
+   "wrong_lesson": "The problem was due to a software bug in the reboot tool. Updating the tool and adding more validation resolved the issue."
+  },
+  {
+   "id": "PM-162",
+   "company": "Kickstarter",
+   "url": "https://web.archive.org/web/20170728131458/https://kickstarter.engineering/the-day-the-replication-died-e543ba45f262",
+   "category": "Uncategorized",
+   "alert": "A critical query is returning inconsistent results. The database is showing unexpected behavior, and some data appears to be missing. Users are reporting errors when accessing their data.",
+   "alert2": "The system is experiencing query failures and data inconsistencies. Metrics show a high number of failed queries and unexpected data returns. End users are encountering errors and incomplete data.",
+   "lesson": "MySQL bugs related to `order by` can cause data inconsistencies. Regularly test and validate query behavior, especially when using sorting operations.",
+   "wrong_lesson": "The issue was caused by a misconfigured database index. Rebuilding the index and optimizing the query resolved the problem."
+  },
+  {
+   "id": "PM-163",
+   "company": "Launchdarkly",
+   "url": "https://launchdarkly.com/blog/what-happened-what-we-learned-and-how-were-improving/",
+   "category": "Uncategorized",
+   "alert": "Multiple services are experiencing high latency and unresponsiveness. The dashboard shows a spike in error rates and failed requests. Users are unable to access the application or receive updates.",
+   "alert2": "A critical service is down, with no available endpoints. Metrics show a surge in retries and failed connections. The system is unable to scale or respond to new requests.",
+   "lesson": "External service outages can cascade through your system, especially when relying on legacy routing and caching mechanisms. Implement failover strategies and monitor dependencies closely.",
+   "wrong_lesson": "The issue was caused by a misconfigured load balancer. Fixing the configuration and adding more resources resolved the problem."
+  },
+  {
+   "id": "PM-164",
+   "company": "Mailgun",
+   "url": "https://status.mailgun.com/incidents/p9nxxql8g9rh",
+   "category": "Uncategorized",
+   "alert": "The database latency has spiked to over 500ms, and the dashboard shows a high number of read operations. Multiple read replicas are reporting 100% CPU usage.",
+   "alert2": "The service 'DataSync' is experiencing a 95% increase in query latency, with the primary node showing signs of overload. The replication lag is now over 10 minutes.",
+   "lesson": "Misconfigured load balancing or routing can lead to cascading overload. Ensure that failover and routing rules are tested under stress and do not inadvertently direct traffic to the wrong nodes.",
+   "wrong_lesson": "A configuration change caused the load balancer to route all traffic to the primary node. Ensure that all configuration changes are reviewed by multiple engineers before deployment."
+  },
+  {
+   "id": "PM-165",
+   "company": "Metrist",
+   "url": "https://web.archive.org/web/20230927050430/https://metrist.io/blog/how-we-found-azures-unannounced-breaking-change/",
+   "category": "Uncategorized",
+   "alert": "The external API service is returning 503 errors for all requests. The dashboard shows a sudden drop in throughput and an increase in timeout rates.",
+   "alert2": "The 'External API Gateway' is experiencing a 90% increase in latency, with some endpoints timing out. The upstream service is showing no available endpoints.",
+   "lesson": "Third-party service changes can have cascading effects on your system. Implement monitoring for external dependencies and have rollback procedures in place.",
+   "wrong_lesson": "The service was misconfigured to use the wrong endpoint. Ensure that all external service endpoints are validated before deployment."
+  },
+  {
+   "id": "PM-167",
+   "company": "NASA",
+   "url": "https://en.wikipedia.org/wiki/Mars_Climate_Orbiter",
+   "category": "Uncategorized",
+   "alert": "The spacecraft's navigation system is reporting inconsistent data. The telemetry shows a discrepancy in the expected trajectory calculations.",
+   "alert2": "The onboard computer is receiving conflicting values for thrust and position. The system is failing to compute a stable flight path.",
+   "lesson": "Unit conversion errors can lead to mission-critical failures. Establish strict validation and verification processes for all data inputs and ensure consistent units across all systems.",
+   "wrong_lesson": "The software had a bug that caused incorrect calculations. Ensure that all code is thoroughly tested and reviewed before deployment."
+  },
+  {
+   "id": "PM-168",
+   "company": "NASA",
+   "url": "https://web.archive.org/web/20161230103247/https://research.microsoft.com/en-us/um/people/mbj/Mars_Pathfinder/Authoritative_Account.html",
+   "category": "Uncategorized",
+   "alert": "A critical system on the Mars rover has unexpectedly reset, causing intermittent communication issues. The dashboard shows multiple service disruptions and failed data transmission attempts. Engineers are being paged due to unexplained system instability.",
+   "alert2": "A remote system has entered an unstable state, with repeated crashes and data loss. Metrics show inconsistent behavior across multiple nodes, and the dashboard is reporting intermittent connectivity failures.",
+   "lesson": "Priority inversion in task scheduling can lead to system instability. Ensure task scheduling mechanisms account for priority inheritance and resource contention.",
+   "wrong_lesson": "A software bug in the OS caused the resets. Updating the OS version resolved the issue."
+  },
+  {
+   "id": "PM-169",
+   "company": "North American Electric Power System",
+   "url": "https://www3.epa.gov/region1/npdes/merrimackstation/pdfs/ar/AR-1165.pdf",
+   "category": "Uncategorized",
+   "alert": "A regional power outage has cascaded through the grid, causing widespread service disruptions. Multiple regions are reporting power loss and system failures. The dashboard shows a significant drop in grid stability.",
+   "alert2": "A major power disruption has triggered a chain reaction across the grid, leading to rolling blackouts. System metrics indicate a loss of redundancy and critical infrastructure failure.",
+   "lesson": "Systemic vulnerabilities and process failures can lead to large-scale outages. Regularly audit and test the resilience of interdependent systems.",
+   "wrong_lesson": "A single power plant failure caused the outage. Replacing the failed plant restored full service."
+  },
+  {
+   "id": "PM-171",
+   "company": "PagerDuty",
+   "url": "https://web.archive.org/web/20211019062735/https://www.pagerduty.com/blog/outage-post-mortem-april-13-2013/",
+   "category": "Uncategorized",
+   "alert": "Two of the three cloud deployments are experiencing high latency and connectivity issues. The dashboard shows failed communication between services and disrupted notification flows.",
+   "alert2": "A network instability issue is affecting two data centers, causing application failures. Metrics show increased latency and failed quorum checks.",
+   "lesson": "Shared network infrastructure can lead to cascading failures. Ensure redundancy and isolation of critical network paths.",
+   "wrong_lesson": "A hardware failure in one data center caused the outage. Replacing the hardware restored full functionality."
+  },
+  {
+   "id": "PM-172",
+   "company": "PagerDuty",
+   "url": "https://status.pagerduty.com/incidents/70m30bh7qfmx",
+   "category": "Uncategorized",
+   "alert": "The SMS and voice call service is experiencing high latency and partial unavailability. Users are reporting failed messages and dropped calls.",
+   "alert2": "A critical communication service is showing signs of instability. Metrics indicate increased error rates and service degradation across multiple endpoints.",
+   "lesson": "Ensure dependencies on third-party services are monitored closely and have fallback mechanisms. Verify that regional outages are accounted for in service-level agreements.",
+   "wrong_lesson": "The issue was caused by misconfigured DNS settings. Ensure all external services are properly configured and tested before deployment."
+  },
+  {
+   "id": "PM-173",
+   "company": "Parity",
+   "url": "https://web.archive.org/web/20180830181639/https://paritytech.io/the-multi-sig-hack-a-postmortem/",
+   "category": "Uncategorized",
+   "alert": "A financial service is experiencing unauthorized transactions. Multiple accounts show unexpected fund movements and failed validation checks.",
+   "alert2": "A critical system is showing signs of data tampering. Audit logs indicate unusual activity and discrepancies in transaction records.",
+   "lesson": "Implement rigorous code review processes and automated security testing for all changes. Ensure that sensitive systems are protected by multi-layered access controls.",
+   "wrong_lesson": "The issue was caused by a misconfigured firewall. Ensure all network access is properly restricted and monitored."
+  },
+  {
+   "id": "PM-174",
+   "company": "Reddit",
+   "url": "https://web.archive.org/web/20221029203405/https://www.reddit.com/r/announcements/comments/4y0m56/why_reddit_was_down_on_aug_11/",
+   "category": "Uncategorized",
+   "alert": "A core backend system is down and not responding to requests. Users are unable to access critical features and the dashboard shows service degradation.",
+   "alert2": "A key service is experiencing slow response times and partial failures. Metrics show increased latency and error rates across multiple endpoints.",
+   "lesson": "Thoroughly test all migration processes and ensure rollback mechanisms are in place. Validate data integrity and system stability during transitions.",
+   "wrong_lesson": "The issue was caused by a software bug. Ensure all code is tested and debugged before deployment."
+  },
+  {
+   "id": "PM-175",
+   "company": "Reddit",
+   "url": "https://web.archive.org/web/20230727225235/https://www.reddit.com/r/RedditEng/comments/11xx5o0/you_broke_reddit_the_piday_outage/",
+   "category": "Uncategorized",
+   "alert": "A Kubernetes cluster is experiencing node failures and workload disruptions. Services are not responding and metrics show high error rates.",
+   "alert2": "A critical cluster is showing signs of instability. Workload networking is down and multiple pods are in a crash loop.",
+   "lesson": "Ensure compatibility between Kubernetes versions and validate metadata changes before upgrades. Implement rollback strategies for critical clusters.",
+   "wrong_lesson": "The issue was caused by a misconfigured load balancer. Ensure all network settings are properly configured and tested."
+  },
+  {
+   "id": "PM-176",
+   "company": "Salesforce",
+   "url": "https://help.salesforce.com/apex/HTViewSolution?urlname=Root-Cause-Message-for-Disruption-of-Service-on-NA14-May-2016&language=en_US",
+   "category": "Uncategorized",
+   "alert": "The primary database cluster is experiencing high latency and partial unavailability. Users are reporting file access issues and inconsistencies across different regions.",
+   "alert2": "A secondary service is showing increased error rates and connection timeouts. Dashboard metrics indicate a spike in failed requests and unexpected data replication delays.",
+   "lesson": "Cascading failures from datacenter outages can lead to cross-region inconsistencies. Ensure redundancy and failover mechanisms are tested and monitored.",
+   "wrong_lesson": "A misconfigured load balancer caused the outage. Ensure all load balancers are properly configured and tested."
+  },
+  {
+   "id": "PM-177",
+   "company": "Salesforce",
+   "url": "https://help.salesforce.com/s/articleView?id=000396429&type=1",
+   "category": "Uncategorized",
+   "alert": "A number of users are unable to log in to the service. Dashboard metrics show a sharp increase in authentication failures and resource access denials.",
+   "alert2": "A subset of users are experiencing access issues again. System logs indicate unexpected blocking of certain resource types during policy enforcement.",
+   "lesson": "Policy changes can have unintended scope and impact. Always validate policy updates in staging environments and monitor real-time effects.",
+   "wrong_lesson": "A misconfigured firewall rule blocked access. Ensure all firewall rules are reviewed and tested before deployment."
+  },
+  {
+   "id": "PM-178",
+   "company": "Shapeshift",
+   "url": "http://web.archive.org/web/20160610080136/https://www.scribd.com/doc/309574927/ShapeShift-Post-Mortem-Public",
+   "category": "Uncategorized",
+   "alert": "A number of users are reporting unauthorized access to their accounts. Dashboard metrics show a spike in login attempts and account activity anomalies.",
+   "alert2": "Several users are experiencing account lockouts and unexpected transactions. System logs indicate unusual access patterns and unauthorized transfers.",
+   "lesson": "Poor security practices can enable insider threats. Implement strict access controls, monitoring, and regular audits to prevent unauthorized access.",
+   "wrong_lesson": "A brute-force attack compromised user accounts. Ensure all accounts have strong passwords and multi-factor authentication."
+  },
+  {
+   "id": "PM-179",
+   "company": "Slack",
+   "url": "https://web.archive.org/web/20181208123409/https://slackhq.com/this-was-not-normal-really",
+   "category": "Uncategorized",
+   "alert": "A large number of users are disconnected from the server. Dashboard metrics show a spike in connection failures and server load spikes.",
+   "alert2": "Users are experiencing intermittent connectivity issues. System logs indicate a massive reconnection event that overwhelmed the database.",
+   "lesson": "Massive reconnection events can overwhelm database capacity. Implement connection throttling and scaling mechanisms to handle large-scale disconnections.",
+   "wrong_lesson": "A database configuration error caused the outage. Ensure all database configurations are reviewed and tested regularly."
+  },
+  {
+   "id": "PM-180",
+   "company": "Slack",
+   "url": "https://slack.engineering/slacks-incident-on-2-22-22/",
+   "category": "Uncategorized",
+   "alert": "The primary service is experiencing uncharacteristic latency and partial unavailability. Multiple endpoints are returning 503 errors. The dashboard shows a spike in error rates and increased latency across the service.",
+   "alert2": "A critical service is showing signs of overload with rising error rates and degraded performance. Metrics indicate that the system is struggling to handle the current load, and some endpoints are timing out.",
+   "lesson": "Ensure that infrastructure changes are monitored for unintended side effects on dependent services. Validate load distribution and system health during and after any scaling or configuration changes.",
+   "wrong_lesson": "The service was overloaded due to a misconfigured load balancer. Ensure that all load balancers are properly configured and monitored for traffic distribution."
+  },
+  {
+   "id": "PM-181",
+   "company": "Square",
+   "url": "https://web.archive.org/web/20210818034431/https://medium.com/square-corner-blog/incident-summary-2017-03-16-2f65be39297",
+   "category": "Uncategorized",
+   "alert": "The authentication service is experiencing a surge in request volume and is returning 500 errors. Users are unable to log in, and the dashboard shows a sharp increase in failed authentication attempts.",
+   "alert2": "A critical service is showing signs of degradation with rising error rates and timeouts. Metrics indicate that the system is struggling to handle the current load, and some endpoints are timing out.",
+   "lesson": "Identify and isolate dependencies between services to prevent cascading failures. Implement circuit breakers and rate limiting to protect against overload from adjacent services.",
+   "wrong_lesson": "The service was overloaded due to a DDoS attack. Ensure that all services are protected by DDoS mitigation tools and rate limiting."
+  },
+  {
+   "id": "PM-183",
+   "company": "Stack Exchange",
+   "url": "http://web.archive.org/web/20160720200842/https://stackstatus.net/post/147710624694/outage-postmortem-july-20-2016",
+   "category": "Uncategorized",
+   "alert": "The health-check endpoint is returning 500 errors for a specific resource. The dashboard shows a spike in failed health checks and increased latency for that resource.",
+   "alert2": "A critical service is showing signs of degradation with rising error rates and timeouts. Metrics indicate that the system is struggling to handle the current load, and some endpoints are timing out.",
+   "lesson": "Review and optimize regular expression patterns for performance, especially for high-traffic or critical endpoints. Consider alternative approaches for complex pattern matching.",
+   "wrong_lesson": "The service was overloaded due to a misconfigured server. Ensure that all servers are properly configured and monitored for resource usage."
+  },
+  {
+   "id": "PM-184",
+   "company": "Stack Exchange",
+   "url": "http://web.archive.org/web/20170130231315/https://stackstatus.net/post/156407746074/outage-postmortem-january-24-2017",
+   "category": "Uncategorized",
+   "alert": "The main database service for Stack Exchange is unresponsive. Users are unable to read or write data. Dashboard metrics show a spike in error rates and a drop in throughput.",
+   "alert2": "The primary data store for the platform is experiencing high latency and partial failures. Metrics indicate a significant increase in query timeouts and connection errors.",
+   "lesson": "Inadequate monitoring and alerting for critical database processes can delay detection of failures. Ensure automated failover and health checks are in place for mission-critical services.",
+   "wrong_lesson": "The database was not properly configured for high availability. Implementing a redundant setup would have prevented the outage."
+  },
+  {
+   "id": "PM-185",
+   "company": "Stripe",
+   "url": "https://support.stripe.com/questions/outage-postmortem-2015-10-08-utc",
+   "category": "Uncategorized",
+   "alert": "The payment processing service is down. Users are unable to complete transactions. Dashboard shows a complete drop in API response rates.",
+   "alert2": "The financial gateway service is experiencing intermittent failures. Metrics indicate a high number of failed requests and timeouts.",
+   "lesson": "Manual operations on production systems should be minimized and strictly reviewed. Implement automated validation and rollback mechanisms for critical changes.",
+   "wrong_lesson": "The database was not properly backed up. Regular backups and recovery drills should be conducted."
+  },
+  {
+   "id": "PM-187",
+   "company": "Tarsnap",
+   "url": "https://mail.tarsnap.com/tarsnap-announce/msg00035.html",
+   "category": "Uncategorized",
+   "alert": "The storage service is experiencing write failures. Users are unable to upload new data. System logs are filling up and causing other services to fail.",
+   "alert2": "The backup system is unresponsive. Metrics show a complete halt in data processing and a full disk usage alert.",
+   "lesson": "Unbounded log growth can lead to critical system failures. Implement log rotation, retention policies, and monitoring for disk usage.",
+   "wrong_lesson": "The storage system was not properly configured. Increasing the disk size would have resolved the issue."
+  },
+  {
+   "id": "PM-188",
+   "company": "Telstra",
+   "url": "https://web.archive.org/web/20170202055452/https://www.businessinsider.com.au/a-fire-in-a-telstra-exchange-is-causing-flight-delays-and-network-outages-2017-2",
+   "category": "Uncategorized",
+   "alert": "A critical service is experiencing random SMS delivery failures. Multiple users are reporting messages being sent to incorrect phone numbers.",
+   "alert2": "A key communication service is showing erratic behavior. Some users are receiving duplicate or corrupted messages, and others are not receiving any at all.",
+   "lesson": "Ensure redundancy and validation in message routing systems. Regularly audit and test failover and error handling mechanisms.",
+   "wrong_lesson": "Implement stricter SMS validation rules to prevent incorrect delivery. Ensure all messages are verified before being sent."
+  },
+  {
+   "id": "PM-189",
+   "company": "Therac-25",
+   "url": "http://sunnyday.mit.edu/papers/therac.pdf",
+   "category": "Uncategorized",
+   "alert": "A critical medical device is displaying unexpected behavior. Patients are receiving radiation doses that are significantly higher than normal.",
+   "alert2": "A system responsible for delivering precise radiation doses is malfunctioning. Multiple incidents have been reported with inconsistent dose levels.",
+   "lesson": "Implement rigorous concurrency control and error handling in safety-critical systems. Conduct regular safety audits and simulations.",
+   "wrong_lesson": "Add additional safety checks to the system to prevent over-dosing. Ensure all software updates are thoroughly tested."
+  },
+  {
+   "id": "PM-191",
+   "company": "Twilio",
+   "url": "https://www.twilio.com/blog/2013/07/billing-incident-post-mortem-breakdown-analysis-and-root-cause.html",
+   "category": "Uncategorized",
+   "alert": "A billing service is experiencing repeated failed transactions. Customers are being charged multiple times for the same service.",
+   "alert2": "A critical payment system is showing signs of instability. Multiple retries are occurring, and some customers are being overcharged.",
+   "lesson": "Ensure proper synchronization and state management in distributed systems. Implement circuit breakers and retry limits.",
+   "wrong_lesson": "Add rate limiting to the payment system to prevent excessive retries. Ensure all transactions are logged and audited."
+  },
+  {
+   "id": "PM-192",
+   "company": "Valve",
+   "url": "https://github.com/valvesoftware/steam-for-linux/issues/3671",
+   "category": "Uncategorized",
+   "alert": "A critical service named 'FileSync' is reporting 100% data loss across all user directories. Users are unable to access their files, and the dashboard shows all storage nodes are offline.",
+   "alert2": "The 'DataVault' system has entered an emergency state, with all user data being erased. Metrics show a complete wipe of local storage, and no backups are accessible.",
+   "lesson": "Lack of proper bug triage and prioritization leads to delayed mitigation of critical issues. Ensure all critical bugs are logged, tracked, and prioritized for resolution.",
+   "wrong_lesson": "Insufficient disk space caused the deletion. Ensure regular monitoring and expansion of storage capacity."
+  },
+  {
+   "id": "PM-193",
+   "company": "Xubuntu",
+   "url": "https://lists.ubuntu.com/archives/xubuntu-users/2025-November/012210.html",
+   "category": "Uncategorized",
+   "alert": "The 'DownloadHub' service is showing corrupted download links. Users are being redirected to an unknown source, and the dashboard indicates a security breach.",
+   "alert2": "The 'DistroDistro' platform has been compromised, with all download links pointing to a malicious file. Users are reporting unexpected file downloads.",
+   "lesson": "Inadequate security measures on public-facing services can lead to malicious tampering. Regularly audit and secure all public endpoints.",
+   "wrong_lesson": "A misconfigured firewall allowed unauthorized access. Ensure all firewall rules are properly configured."
+  },
+  {
+   "id": "PM-194",
+   "company": "Yeller",
+   "url": "https://web.archive.org/web/20201018145502/http://yellerapp.com/posts/2014-08-04-postmortem1.html",
+   "category": "Uncategorized",
+   "alert": "A critical service named 'MessageRouter' is experiencing severe delays. All messages are taking over 6 hours to be delivered, and the dashboard shows a network partition.",
+   "alert2": "The 'CommCenter' system is showing message delivery failures. Metrics indicate a possible network issue, and some messages are stuck in transit.",
+   "lesson": "Network partitions can cause significant delays in message delivery. Ensure robust logging and monitoring to detect and resolve such issues quickly.",
+   "wrong_lesson": "A software bug caused the delay. Ensure regular code reviews and testing to catch such issues early."
+  },
+  {
+   "id": "PM-195",
+   "company": "Zerodha",
+   "url": "https://zerodha.com/marketintel/bulletin/229363/post-mortem-of-technical-issue-august-29-2019",
+   "category": "Uncategorized",
+   "alert": "The 'TradeProcessor' service is experiencing a complete system crash. All orders are being rejected, and the dashboard shows a critical error in the order processing pipeline.",
+   "alert2": "The 'OrderHub' system has collapsed, with no new orders being processed. Metrics show a sudden spike in system load and a complete failure in order handling.",
+   "lesson": "Unanticipated load patterns can overwhelm systems not designed for such scale. Ensure systems are tested for edge cases and can handle extreme load.",
+   "wrong_lesson": "A configuration error caused the system to crash. Ensure all configurations are reviewed and tested before deployment."
+  },
+  {
+   "id": "PM-196",
+   "company": "Zerodha",
+   "url": "https://zerodha.com/marketintel/bulletin/105569/postmortem-trading-and-hanging-orders-on-12th-april-2018",
+   "category": "Uncategorized",
+   "alert": "The order processing dashboard is showing a spike in failed bracket orders with a 95% error rate. Users are reporting delayed or missing trades on the trading platform. The latency metrics for the order execution service have spiked to over 500ms.",
+   "alert2": "The order validation service is experiencing a high number of timeouts, with 80% of requests failing. The trade confirmation dashboard is showing a significant drop in successful trades. The backup network connection is intermittently dropping packets.",
+   "lesson": "Inadequate redundancy and lack of failover testing can lead to prolonged service disruptions. Ensure that backup systems are thoroughly tested and monitored for reliability under stress.",
+   "wrong_lesson": "The primary network connection was unstable, so the fix was to switch to the backup line. Ensure all primary connections are monitored and failover is automated."
+  }
+ ]
+}

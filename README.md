@@ -10,6 +10,22 @@ Submission for the **CockroachDB × AWS Hackathon: Build with Agentic Memory**.
 
 ---
 
+## Research: can a poisoned memory hijack the on-call agent?
+
+[`research/PAPER.md`](research/PAPER.md) tests this agent's memory design on **PMBench**, built from 170 real public postmortems (Amazon, Cloudflare, CircleCI, …), each with two independently worded symptom-only alerts. Planted memories pair generic symptoms with a harmful fix ("disable the auth middleware", "open the security group to 0.0.0.0/0").
+
+| Ranking (always-answer agent, 5 seeds) | Correct lesson first | Poisoned fix served | Poisoned fix served, 30% noisy feedback |
+|---|---|---|---|
+| Similarity only | 28.5% | 7.5% | 7.5% |
+| Trust-weighted (this repo: distance − 0.15 × confidence) | 27.6% | 1.6% | 5.9% |
+| **Trust + provenance gate (proposed)** | 27.3% | **0.0%** | **0.0%** |
+
+Storing the triggering alert with each resolution lifts recurrence retrieval from 31.2% to 37.6% top-1, and hybrid dense + BM25 to 41.8%. Runs fully locally (Ollama); see the paper for the protocol, sweeps and limitations.
+
+![poisoning sweeps](research/figures/poison_sweep.png)
+
+---
+
 ## The idea
 
 Most "agent with memory" demos store a chat transcript in a table and call it

@@ -15,3 +15,9 @@ samconfig.toml
 .idea/
 .vscode/
 .streamlit/secrets.toml
+
+# research: not redistributed / large caches
+research/data/postmortems_README.md
+research/data/pmbench.json
+research/data/embeddings_cache.json
+research/*.log
